@@ -16,7 +16,7 @@ import {
 } from 'three'
 import { debounce } from './utility'
 import vertexShader from './vertex-shader.glsl?raw'
-import fragmentShader from './fragment-shader.glsl?raw'
+import fragmentShader from './fragment-shader'
 
 const renderer = new WebGLRenderer({})
 const scene = new Scene()
@@ -29,8 +29,6 @@ const camera = new OrthographicCamera(
   1000
 )
 const geometry = new PlaneBufferGeometry(200, 200, 1, 1)
-console.log(geometry.getIndex())
-console.log(geometry.attributes)
 const material = new ShaderMaterial({
   uniforms: {
     time: {
@@ -49,6 +47,7 @@ const mesh = new Mesh(geometry, material)
 window.addEventListener(
   'resize',
   debounce((_event: Event): void => {
+    setGeometry()
     setCamera()
     setRenderer()
   })
@@ -60,6 +59,7 @@ scene.add(mesh)
 
 setCamera()
 setRenderer()
+setGeometry()
 update()
 
 function update(): void {
@@ -73,9 +73,12 @@ function update(): void {
   })
 }
 
-function setCamera(): void {
-  const halfW = window.innerWidth / 2
-  const halfH = window.innerHeight / 2
+function setCamera(
+  width: number = window.innerWidth,
+  height: number = window.innerHeight
+): void {
+  const halfW = width / 2
+  const halfH = height / 2
 
   camera.left = -halfW
   camera.right = halfW
@@ -85,7 +88,28 @@ function setCamera(): void {
   camera.updateProjectionMatrix()
 }
 
-function setRenderer(): void {
-  renderer.setPixelRatio(window.devicePixelRatio)
-  renderer.setSize(window.innerWidth, window.innerHeight)
+function setRenderer(
+  width: number = window.innerWidth,
+  height: number = window.innerHeight,
+  devicePixelRatio: number = window.devicePixelRatio
+): void {
+  renderer.setPixelRatio(devicePixelRatio)
+  renderer.setSize(width, height)
+}
+
+function setGeometry(
+  width: number = window.innerWidth,
+  height: number = window.innerHeight
+): void {
+  console.log(geometry.attributes)
+
+  const halfW = width / 2
+  const halfH = height / 2
+
+  geometry.attributes.position.setXYZ(0, -halfW, halfH, 0)
+  geometry.attributes.position.setXYZ(1, halfW, halfH, 0)
+  geometry.attributes.position.setXYZ(2, -halfW, -halfH, 0)
+  geometry.attributes.position.setXYZ(3, halfW, -halfH, 0)
+
+  geometry.attributes.position.needsUpdate = true
 }
