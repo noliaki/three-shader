@@ -41,7 +41,7 @@ const material = new ShaderMaterial({
     resolution: {
       value: [window.innerWidth, window.innerHeight],
     },
-    tex: {
+    uTexture: {
       value: texture,
     },
   },
@@ -120,10 +120,4 @@ function setGeometry(
   geometry.attributes.position.setXYZ(3, halfW, -halfH, 0)
 
   geometry.attributes.position.needsUpdate = true
-}
-
-function loadTexture(src: string): Promise<Texture> {
-  return new Promise((resolve, reject): void => {
-    new TextureLoader().load('/photo0000-0222.jpg')
-  })
 }
