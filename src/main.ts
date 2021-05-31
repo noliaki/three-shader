@@ -13,6 +13,8 @@ import {
   DoubleSide,
   FrontSide,
   BackSide,
+  TextureLoader,
+  Texture,
 } from 'three'
 import { debounce } from './utility'
 import vertexShader from './vertex-shader.glsl?raw'
@@ -28,6 +30,8 @@ const camera = new OrthographicCamera(
   0,
   1000
 )
+const texture = new TextureLoader().load('/photo0000-0222.jpg')
+texture.flipY = false
 const geometry = new PlaneBufferGeometry(200, 200, 1, 1)
 const material = new ShaderMaterial({
   uniforms: {
@@ -37,11 +41,15 @@ const material = new ShaderMaterial({
     resolution: {
       value: [window.innerWidth, window.innerHeight],
     },
+    tex: {
+      value: texture,
+    },
   },
   vertexShader,
   fragmentShader,
   side: BackSide,
 })
+
 const mesh = new Mesh(geometry, material)
 
 window.addEventListener(
@@ -112,4 +120,10 @@ function setGeometry(
   geometry.attributes.position.setXYZ(3, halfW, -halfH, 0)
 
   geometry.attributes.position.needsUpdate = true
+}
+
+function loadTexture(src: string): Promise<Texture> {
+  return new Promise((resolve, reject): void => {
+    new TextureLoader().load('/photo0000-0222.jpg')
+  })
 }

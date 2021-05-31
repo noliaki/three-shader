@@ -4,13 +4,17 @@ uniform vec2 resolution;
 varying vec2 vUv;
 varying vec3 vPosition;
 
-void main(void) {
-  float noise = snoise(vec3(vUv, time));
+uniform sampler2D tex;
 
-  gl_FragColor = vec4(
-    (snoise(vec3(vUv * 2.0, time / 2.0)) + 1.0) / 2.0,
-    (snoise(vec3(vUv / 2.0, time / 3.0)) + 1.0) / 2.0,
-    (snoise(vec3(vUv, time / 4.0)) + 1.0) / 2.0,
-    1.0
-  );
+float rand(vec2 co){
+  return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+
+void main(void) {
+  float noise = snoise(vec3(vUv, time / 3.0));
+
+  vec4 color = texture2D(tex, vUv + (rand(vUv * noise / 100.0) / 60.0) + noise / 10.0);
+
+  gl_FragColor = color;
 }
