@@ -7,3 +7,12 @@
 canvas {
   display: block;
 }
+
+input {
+  position: fixed;
+  right: 0;
+  bottom: 40px;
+  left: 0;
+  margin-right: auto;
+  margin-left: auto;
+}

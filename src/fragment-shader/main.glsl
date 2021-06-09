@@ -1,10 +1,10 @@
 uniform float time;
 uniform vec2 resolution;
+uniform sampler2D uTexture;
+uniform float progress;
 
 varying vec2 vUv;
 varying vec3 vPosition;
-
-uniform sampler2D uTexture;
 
 float rand(vec2 co) {
   float a = fract(dot(co, vec2(2.067390879775102, 12.451168662908249))) - 0.5;
@@ -15,15 +15,15 @@ float rand(vec2 co) {
 
 void main(void) {
   float noise = snoise(
-    vec3(vUv, time)
+    vec3(vUv / 1.4, time / (4.0 * progress))
   );
 
-  float offset = rand(vUv);
+  // float offset = rand(vUv);
 
-  vec4 color = texture2D(
-    uTexture,
-    vUv + offset / 50.0
-  );
+  // vec4 color = texture2D(
+  //   uTexture,
+  //   (vUv + noise * 1.5)
+  // );
 
-  gl_FragColor = color;
+  gl_FragColor = texture2D(uTexture, (vUv + noise * 2.0 * progress));
 }

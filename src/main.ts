@@ -17,7 +17,7 @@ import {
   Texture,
 } from 'three'
 import { debounce } from './utility'
-import vertexShader from './vertex-shader.glsl?raw'
+import vertexShader from './vertex-shader'
 import fragmentShader from './fragment-shader'
 
 const renderer = new WebGLRenderer({})
@@ -32,7 +32,7 @@ const camera = new OrthographicCamera(
 )
 const texture = new TextureLoader().load('/photo0000-0222.jpg')
 texture.flipY = false
-const geometry = new PlaneBufferGeometry(200, 200, 1, 1)
+const geometry = new PlaneBufferGeometry(200, 200, 100, 100)
 const material = new ShaderMaterial({
   uniforms: {
     time: {
@@ -44,6 +44,9 @@ const material = new ShaderMaterial({
     uTexture: {
       value: texture,
     },
+    progress: {
+      value: 0,
+    },
   },
   vertexShader,
   fragmentShader,
@@ -51,6 +54,7 @@ const material = new ShaderMaterial({
 })
 
 const mesh = new Mesh(geometry, material)
+let progress = 0
 
 window.addEventListener(
   'resize',
@@ -60,6 +64,12 @@ window.addEventListener(
     setRenderer()
   })
 )
+
+document
+  .getElementById('range')
+  ?.addEventListener('input', (event: Event): void => {
+    progress = parseFloat((event.target as HTMLInputElement)?.value) / 1000
+  })
 
 document.body.appendChild(renderer.domElement)
 
@@ -72,6 +82,9 @@ update()
 
 function update(): void {
   material.uniforms.time.value += 0.01
+  material.uniforms.progress.value +=
+    (progress - material.uniforms.progress.value) / 10
+
   material.needsUpdate = true
 
   renderer.render(scene, camera)
@@ -109,15 +122,7 @@ function setGeometry(
   width: number = window.innerWidth,
   height: number = window.innerHeight
 ): void {
-  console.log(geometry.attributes)
+  const geometry = new PlaneBufferGeometry(width, height, 100, 100)
 
-  const halfW = width / 2
-  const halfH = height / 2
-
-  geometry.attributes.position.setXYZ(0, -halfW, halfH, 0)
-  geometry.attributes.position.setXYZ(1, halfW, halfH, 0)
-  geometry.attributes.position.setXYZ(2, -halfW, -halfH, 0)
-  geometry.attributes.position.setXYZ(3, halfW, -halfH, 0)
-
-  geometry.attributes.position.needsUpdate = true
+  mesh.geometry = geometry
 }
