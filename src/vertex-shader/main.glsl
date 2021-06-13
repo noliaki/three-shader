@@ -13,8 +13,8 @@ void main(void) {
     (uv.y * 2.0) - 1.0
   );
 
-  float noise = snoise(vec3(uv, time)) * (length(p.x) + length(p.y)) / 2.0;
+  float noise = (snoise(vec3(position.x / resolution.x, position.y / resolution.y,  time)) + 1.0) / 2.0;
   vec4 pos = vec4(position.xy + noise * 100.0, 0.0, 1.0);
 
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position.xy, 0.0, 1.0);
 }

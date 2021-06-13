@@ -5,16 +5,9 @@ import {
   OrthographicCamera,
   ShaderMaterial,
   Mesh,
-  BufferGeometry,
   PlaneBufferGeometry,
-  MeshBasicMaterial,
-  PerspectiveCamera,
-  PlaneGeometry,
-  DoubleSide,
-  FrontSide,
   BackSide,
   TextureLoader,
-  Texture,
 } from 'three'
 import { debounce } from './utility'
 import vertexShader from './vertex-shader'
@@ -122,7 +115,7 @@ function setGeometry(
   width: number = window.innerWidth,
   height: number = window.innerHeight
 ): void {
-  const geometry = new PlaneBufferGeometry(width, height, 100, 100)
+  const geometry = new PlaneBufferGeometry(width, height, 2, 2)
 
   mesh.geometry = geometry
 }

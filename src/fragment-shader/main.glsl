@@ -15,7 +15,7 @@ float rand(vec2 co) {
 
 void main(void) {
   float noise = snoise(
-    vec3(vUv / 1.4, time / (4.0 * progress))
+    vec3(vUv / 1.4, time / (4.0 - (progress * 2.0)))
   );
 
   // float offset = rand(vUv);
