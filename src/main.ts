@@ -25,7 +25,7 @@ const camera = new OrthographicCamera(
 )
 const texture = new TextureLoader().load('/photo0000-0222.jpg')
 texture.flipY = false
-const geometry = new PlaneBufferGeometry(200, 200, 100, 100)
+const geometry = createGeometry()
 const material = new ShaderMaterial({
   uniforms: {
     time: {
@@ -52,7 +52,8 @@ let progress = 0
 window.addEventListener(
   'resize',
   debounce((_event: Event): void => {
-    setGeometry()
+    mesh.geometry = createGeometry()
+
     setCamera()
     setRenderer()
   })
@@ -70,7 +71,6 @@ scene.add(mesh)
 
 setCamera()
 setRenderer()
-setGeometry()
 update()
 
 function update(): void {
@@ -111,11 +111,9 @@ function setRenderer(
   renderer.setSize(width, height)
 }
 
-function setGeometry(
+function createGeometry(
   width: number = window.innerWidth,
   height: number = window.innerHeight
-): void {
-  const geometry = new PlaneBufferGeometry(width, height, 2, 2)
-
-  mesh.geometry = geometry
+): PlaneBufferGeometry {
+  return new PlaneBufferGeometry(width, height, 2, 2)
 }
