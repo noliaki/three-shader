@@ -9,7 +9,7 @@ import {
   BackSide,
   TextureLoader,
 } from 'three'
-import { debounce } from './utility'
+import { debounce } from '../src/utility'
 import vertexShader from './vertex-shader'
 import fragmentShader from './fragment-shader'
 
