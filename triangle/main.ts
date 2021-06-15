@@ -6,7 +6,6 @@ import {
   ShaderMaterial,
   Mesh,
   PlaneBufferGeometry,
-  BackSide,
   TextureLoader,
   BufferGeometry,
   BufferAttribute,
@@ -117,12 +116,12 @@ function setRenderer(
 function createGeometry(
   width: number = window.innerWidth,
   height: number = window.innerHeight,
-  widthSegment: number = Math.floor(window.innerWidth / 120),
-  heightSegment: number = Math.floor(window.innerHeight / 130)
+  widthSegment: number = 50,
+  heightSegment: number = 50
 ): BufferGeometry {
   const segments = widthSegment * heightSegment
 
-  const top = height / 2
+  const top = -(height / 2)
   const left = -(width / 2)
 
   const cellWidth = width / widthSegment
@@ -130,87 +129,119 @@ function createGeometry(
 
   const position = []
   const index = []
+  const normal = []
   const uv = []
+  const stagger = []
 
   for (let i: number = 0; i < segments; i++) {
-    const row = Math.floor(i / heightSegment)
+    const row = Math.floor(i / widthSegment)
     const col = i % widthSegment
+    const step = i * 3 * 2
 
-    position.push(col * cellWidth)
-    position.push(row * cellHeight)
+    position.push(col * cellWidth + left)
+    position.push(row * cellHeight + top)
     position.push(0)
+    normal.push(0)
+    normal.push(0)
+    normal.push(1)
+    stagger.push(Math.random())
+    stagger.push(Math.random())
+    stagger.push(Math.random())
+    uv.push(col / widthSegment)
+    uv.push(row / heightSegment)
+    index.push(step + 0)
 
-    position.push((col + 1) * cellWidth)
-    position.push(row * cellHeight)
+    position.push((col + 1) * cellWidth + left)
+    position.push(row * cellHeight + top)
     position.push(0)
+    normal.push(0)
+    normal.push(0)
+    normal.push(1)
+    stagger.push(Math.random())
+    stagger.push(Math.random())
+    stagger.push(Math.random())
+    uv.push((col + 1) / widthSegment)
+    uv.push(row / heightSegment)
+    index.push(step + 1)
 
-    position.push(col * cellWidth)
-    position.push((row + 1) * cellHeight)
+    position.push(col * cellWidth + left)
+    position.push((row + 1) * cellHeight + top)
     position.push(0)
+    normal.push(0)
+    normal.push(0)
+    normal.push(1)
+    stagger.push(Math.random())
+    stagger.push(Math.random())
+    stagger.push(Math.random())
+    uv.push(col / widthSegment)
+    uv.push((row + 1) / heightSegment)
+    index.push(step + 2)
 
-    position.push((col + 1) * cellWidth)
-    position.push(row * cellHeight)
+    position.push((col + 1) * cellWidth + left)
+    position.push(row * cellHeight + top)
     position.push(0)
+    normal.push(0)
+    normal.push(0)
+    normal.push(1)
+    stagger.push(Math.random())
+    stagger.push(Math.random())
+    stagger.push(Math.random())
+    uv.push((col + 1) / widthSegment)
+    uv.push(row / heightSegment)
+    index.push(step + 3)
 
-    position.push((col + 1) * cellWidth)
-    position.push((row + 1) * cellHeight)
+    position.push((col + 1) * cellWidth + left)
+    position.push((row + 1) * cellHeight + top)
     position.push(0)
+    normal.push(0)
+    normal.push(0)
+    normal.push(1)
+    stagger.push(Math.random())
+    stagger.push(Math.random())
+    stagger.push(Math.random())
+    uv.push((col + 1) / widthSegment)
+    uv.push((row + 1) / heightSegment)
+    index.push(step + 4)
 
-    position.push(col * cellWidth)
-    position.push((row + 1) * cellHeight)
+    position.push(col * cellWidth + left)
+    position.push((row + 1) * cellHeight + top)
     position.push(0)
-
-    index.push(i * 3 + 0)
-    index.push(i * 3 + 1)
-    index.push(i * 3 + 2)
-
-    index.push(i * 3 + 3)
-    index.push(i * 3 + 4)
-    index.push(i * 3 + 5)
+    normal.push(0)
+    normal.push(0)
+    normal.push(1)
+    stagger.push(Math.random())
+    stagger.push(Math.random())
+    stagger.push(Math.random())
+    uv.push(col / widthSegment)
+    uv.push((row + 1) / heightSegment)
+    index.push(step + 5)
   }
 
-  const planeGeometry = new PlaneBufferGeometry(
-    width,
-    height,
-    widthSegment,
-    heightSegment
-  )
   const geometry = new BufferGeometry()
 
   geometry.setAttribute(
     'position',
-    new BufferAttribute(
-      planeGeometry.attributes.position.array,
-      planeGeometry.attributes.position.itemSize
-    )
+    new BufferAttribute(new Float32Array(position), 3)
   )
-  geometry.setAttribute(
-    'uv',
-    new BufferAttribute(
-      planeGeometry.attributes.uv.array,
-      planeGeometry.attributes.uv.itemSize
-    )
-  )
+  geometry.setAttribute('uv', new BufferAttribute(new Float32Array(uv), 2))
   geometry.setAttribute(
     'normal',
-    new BufferAttribute(
-      planeGeometry.attributes.normal.array,
-      planeGeometry.attributes.normal.itemSize
-    )
+    new BufferAttribute(new Float32Array(normal), 3)
+  )
+  geometry.setAttribute(
+    'stagger',
+    new BufferAttribute(new Float32Array(stagger), 3)
+  )
+  geometry.setAttribute(
+    'index',
+    new BufferAttribute(new Float32Array(index), 1)
   )
 
-  geometry.setIndex(
-    new BufferAttribute(
-      new Uint16Array(
-        Array.from(
-          Array(planeGeometry.attributes.position.array.length / 3)
-        ).map((_, index: number): number => index)
-      ),
-      1
-    )
-  )
+  geometry.setIndex(index)
 
-  console.log(planeGeometry)
+  console.log(
+    new PlaneBufferGeometry(width, height, widthSegment, heightSegment)
+  )
   console.log(geometry)
 
   return geometry
