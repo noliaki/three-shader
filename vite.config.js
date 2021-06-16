@@ -5,6 +5,7 @@ module.exports = {
     rollupOptions: {
       input: {
         melt: resolve(__dirname, 'melt/index.html'),
+        triangle: resolve(__dirname, 'triangle/index.html'),
       },
     },
   },

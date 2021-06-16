@@ -15,9 +15,9 @@ float rand(vec2 co) {
 }
 
 void main(void) {
-  float noise = (snoise(vec3(vPosition.xy / 10.0, time / 3.0)) + 1.0) / 2.0;
+  float noise = (snoise(vec3(vUv * 0.1, time / 3.0)) + 1.0) / 2.0;
 
-  float s = vIndex / 80.0;
+  float s = vIndex / 250.0;
 
   vec2 p = vec2(
     ((vPosition.x + (resolution.x / 2.0)) / 2.0) / resolution.x,

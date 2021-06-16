@@ -22,13 +22,15 @@ const camera = new OrthographicCamera(
   window.innerWidth / 2,
   -window.innerHeight / 2,
   window.innerHeight / 2,
-  0,
+  -1000,
   1000
 )
 const texture = new TextureLoader().load('/photo0000-0222.jpg')
 texture.flipY = false
-const geometry = createGeometry()
-const material = new ShaderMaterial({
+
+const mesh = new Mesh()
+mesh.geometry = createGeometry()
+mesh.material = new ShaderMaterial({
   uniforms: {
     time: {
       value: 0,
@@ -48,7 +50,6 @@ const material = new ShaderMaterial({
   side: DoubleSide,
 })
 
-const mesh = new Mesh(geometry, material)
 let progress = 0
 
 window.addEventListener(
@@ -76,6 +77,8 @@ setRenderer()
 update()
 
 function update(): void {
+  const material = mesh.material as ShaderMaterial
+
   material.uniforms.time.value += 0.01
   material.uniforms.progress.value +=
     (progress - material.uniforms.progress.value) / 10
@@ -132,14 +135,24 @@ function createGeometry(
   const normal = []
   const uv = []
   const stagger = []
+  const center = []
 
   for (let i: number = 0; i < segments; i++) {
     const row = Math.floor(i / widthSegment)
     const col = i % widthSegment
     const step = i * 3 * 2
 
-    position.push(col * cellWidth + left)
-    position.push(row * cellHeight + top)
+    const x1 = col * cellWidth + left
+    const y1 = row * cellHeight + top
+
+    const x2 = x1 + cellWidth
+    const y2 = y1
+
+    const x3 = x1
+    const y3 = y1 + cellHeight
+
+    position.push(x1)
+    position.push(y1)
     position.push(0)
     normal.push(0)
     normal.push(0)
@@ -150,9 +163,12 @@ function createGeometry(
     uv.push(col / widthSegment)
     uv.push(row / heightSegment)
     index.push(step + 0)
+    center.push((x1 + x2 + x3) / 3)
+    center.push((y1 + y2 + y3) / 3)
+    center.push(0)
 
-    position.push((col + 1) * cellWidth + left)
-    position.push(row * cellHeight + top)
+    position.push(x2)
+    position.push(y2)
     position.push(0)
     normal.push(0)
     normal.push(0)
@@ -163,9 +179,12 @@ function createGeometry(
     uv.push((col + 1) / widthSegment)
     uv.push(row / heightSegment)
     index.push(step + 1)
+    center.push((x1 + x2 + x3) / 3)
+    center.push((y1 + y2 + y3) / 3)
+    center.push(0)
 
-    position.push(col * cellWidth + left)
-    position.push((row + 1) * cellHeight + top)
+    position.push(x3)
+    position.push(y3)
     position.push(0)
     normal.push(0)
     normal.push(0)
@@ -176,9 +195,21 @@ function createGeometry(
     uv.push(col / widthSegment)
     uv.push((row + 1) / heightSegment)
     index.push(step + 2)
+    center.push((x1 + x2 + x3) / 3)
+    center.push((y1 + y2 + y3) / 3)
+    center.push(0)
 
-    position.push((col + 1) * cellWidth + left)
-    position.push(row * cellHeight + top)
+    const x4 = x2
+    const y4 = y1
+
+    const x5 = x4
+    const y5 = y4 + cellHeight
+
+    const x6 = x4 - cellWidth
+    const y6 = y5
+
+    position.push(x4)
+    position.push(y4)
     position.push(0)
     normal.push(0)
     normal.push(0)
@@ -189,9 +220,12 @@ function createGeometry(
     uv.push((col + 1) / widthSegment)
     uv.push(row / heightSegment)
     index.push(step + 3)
+    center.push((x4 + x5 + x6) / 3)
+    center.push((y4 + y5 + y6) / 3)
+    center.push(0)
 
-    position.push((col + 1) * cellWidth + left)
-    position.push((row + 1) * cellHeight + top)
+    position.push(x5)
+    position.push(y5)
     position.push(0)
     normal.push(0)
     normal.push(0)
@@ -202,9 +236,12 @@ function createGeometry(
     uv.push((col + 1) / widthSegment)
     uv.push((row + 1) / heightSegment)
     index.push(step + 4)
+    center.push((x4 + x5 + x6) / 3)
+    center.push((y4 + y5 + y6) / 3)
+    center.push(0)
 
-    position.push(col * cellWidth + left)
-    position.push((row + 1) * cellHeight + top)
+    position.push(x6)
+    position.push(y6)
     position.push(0)
     normal.push(0)
     normal.push(0)
@@ -215,6 +252,9 @@ function createGeometry(
     uv.push(col / widthSegment)
     uv.push((row + 1) / heightSegment)
     index.push(step + 5)
+    center.push((x4 + x5 + x6) / 3)
+    center.push((y4 + y5 + y6) / 3)
+    center.push(0)
   }
 
   const geometry = new BufferGeometry()
@@ -235,6 +275,10 @@ function createGeometry(
   geometry.setAttribute(
     'index',
     new BufferAttribute(new Float32Array(index), 1)
+  )
+  geometry.setAttribute(
+    'center',
+    new BufferAttribute(new Float32Array(center), 3)
   )
 
   geometry.setIndex(index)
