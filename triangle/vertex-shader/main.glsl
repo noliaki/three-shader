@@ -45,7 +45,8 @@ void main(void) {
   vPosition = position;
   vIndex = index;
   vStagger = stagger;
-  float noise = snoise(vec3(stagger.xy, time / 2.0));
+
+  float noise = snoise(vec3(stagger.xy, time / 10.0));
   float normalNoise = (noise + 1.0) / 2.0;
 
   vec2 p = vec2(
@@ -54,8 +55,8 @@ void main(void) {
   );
 
 
-  vec3 axis = stagger * normalNoise;
-  float rad = radians(time * 500.0 * pow(normalNoise, 3.0));
+  vec3 axis = vec3(normalNoise);
+  float rad = radians(time + (noise * 10.0));
 
   vec4 quat = quatFromAxisAngle(axis, rad);
 
