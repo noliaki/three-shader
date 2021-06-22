@@ -46,17 +46,25 @@ void main(void) {
   vIndex = index;
   vStagger = stagger;
 
-  float noise = snoise(vec3(stagger.xy, time / 3.0));
+  float noise = snoise(vec3(stagger.xy * 5.0, time / 3.0));
   float normalNoise = (noise + 1.0) / 2.0;
+
+  float delay = (
+    ((position.x / (resolution.x * 0.5)) + 1.0) * 0.5 +
+    ((position.y / (resolution.y * 0.5)) + 1.0) * 0.5
+  ) * 0.5 * 0.9;
+
+  float duration = 1.0;
+
+  float tProgress = clamp(progress - delay, 0.0, duration) / duration;
 
   vec2 p = vec2(
     (uv.x * 2.0) - 1.0,
     (uv.y * 2.0) - 1.0
   );
 
-
-  vec3 axis = normalNoise * stagger * 1.2;
-  float rad = radians(sin(time + (noise * 5.0)) * 1000.0);
+  vec3 axis = normalNoise * stagger * 2.0;
+  float rad = radians(360.0 * tProgress * noise * -1.0 + noise * 3600.0 * tProgress);
 
   vec4 quat = quatFromAxisAngle(axis, rad);
 
@@ -66,7 +74,7 @@ void main(void) {
 
   vec4 pos = mix(
     vec4(position, 1.0),
-    vec4(rotateVector(quat, orig) + center + (noise * (resolution.x / 70.0)), 1.0),
+    vec4(rotateVector(quat, orig) + center, 1.0),
     progress
   );
 
