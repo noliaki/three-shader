@@ -10,6 +10,7 @@ varying vec2 vUv;
 varying vec3 vPosition;
 varying float vIndex;
 varying vec3 vStagger;
+varying vec3 vCenter;
 
 vec3 rotate3d(vec3 p, float angle, vec3 axis){
   vec3 a = normalize(axis);
@@ -45,6 +46,7 @@ void main(void) {
   vPosition = position;
   vIndex = index;
   vStagger = stagger;
+  vCenter = center;
 
   float noise = snoise(vec3(stagger.xy * 5.0, time / 3.0));
   float normalNoise = (noise + 1.0) / 2.0;
@@ -52,9 +54,9 @@ void main(void) {
   float delay = (
     ((position.x / (resolution.x * 0.5)) + 1.0) * 0.5 +
     ((position.y / (resolution.y * 0.5)) + 1.0) * 0.5
-  ) * 0.5 * 0.9;
+  ) * 0.5 * 0.5;
 
-  float duration = 1.0;
+  float duration = 0.5;
 
   float tProgress = clamp(progress - delay, 0.0, duration) / duration;
 
@@ -63,7 +65,7 @@ void main(void) {
     (uv.y * 2.0) - 1.0
   );
 
-  vec3 axis = normalNoise * stagger * 2.0;
+  vec3 axis = normalNoise * stagger * 1.2;
   float rad = radians(360.0 * tProgress * noise * -1.0 + noise * 3600.0 * tProgress);
 
   vec4 quat = quatFromAxisAngle(axis, rad);
