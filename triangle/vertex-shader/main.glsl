@@ -43,6 +43,19 @@ vec4 quatFromAxisAngle(vec3 axis, float angle) {
   return vec4(axis.xyz * sin(halfAngle), cos(halfAngle));
 }
 
+vec3 bezier(vec3 A, vec3 B, vec3 C, vec3 D, float t) {
+  vec3 E = mix(A, B, t);
+  vec3 F = mix(B, C, t);
+  vec3 G = mix(C, D, t);
+
+  vec3 H = mix(E, F, t);
+  vec3 I = mix(F, G, t);
+
+  vec3 P = mix(H, I, t);
+
+  return P;
+}
+
 void main(void) {
   vUv = uv;
   vPosition = position;
@@ -50,8 +63,10 @@ void main(void) {
   vStagger = stagger;
   vCenter = center;
 
-  float noise = snoise(vec3(stagger.xy * 5.0, time / 30.0));
+  float noise = snoise(vec3(stagger.xy * 5.0, time / 5.0));
   float normalNoise = (noise + 1.0) / 2.0;
+  float positionNoise = snoise(vec3(center.xy, time / 10.0));
+  float positionNoise2 = snoise(vec3(center.zx, time / 10.0));
 
   float delay = (
     ((position.x / (resolution.x * 0.5)) + 1.0) * 0.5 +
@@ -72,19 +87,41 @@ void main(void) {
 
   vec4 quat = quatFromAxisAngle(axis, rad);
 
-  vec3 transformed = vec3(position);
 
-  vec3 offset = vec3(center.x + noise * 30.0, center.y + noise * 30.0, 0.0);
-  vec3 orig = position - offset;
+  vec3 orig = position - center;
+  vec3 transformed = rotateVector(quat, orig) + center;
+  vec3 offset = bezier(
+    vec3(
+      sin(time / 20.0 * positionNoise) * 5000.0,
+      cos(time / 30.0 * positionNoise2) * 5000.0,
+      sin(time / 40.0 * positionNoise) * 5000.0
+    ),
+    vec3(
+      cos(time / 50.0 * positionNoise) * 2500.0,
+      sin(time / 60.0 * positionNoise2) * 2500.0,
+      sin(time / 70.0 * positionNoise) * 2500.0
+    ),
+    vec3(
+      sin(time / 80.0 * positionNoise) * 1500.0,
+      sin(time / 90.0 * positionNoise2) * 1500.0,
+      cos(time / 10.0 * positionNoise) * 1500.0
+    ),
+    vec3(
+      sin(time / 20.0 * positionNoise) * 200.0,
+      sin(time / 25.0 * positionNoise2) * 200.0,
+      sin(time / 4.0 * positionNoise) * 200.0
+    ),
+    tProgress
+  );
 
   vNormal = rotateVector(quat, normal);
   // vNormal = normal;
 
-  vec4 pos = mix(
-    vec4(position, 1.0),
-    vec4(rotateVector(quat, orig) + offset, 1.0),
-    progress
+  vec3 pos = mix(
+    position,
+    transformed + offset,
+    tProgress
   );
 
-  gl_Position = projectionMatrix * modelViewMatrix * pos;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
 }

@@ -10,24 +10,23 @@ import {
   BufferGeometry,
   BufferAttribute,
   DoubleSide,
+  PerspectiveCamera,
 } from 'three'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { debounce } from '../src/utility'
 import vertexShader from './vertex-shader'
 import fragmentShader from './fragment-shader'
 
 const renderer = new WebGLRenderer({})
 const scene = new Scene()
-const camera = new OrthographicCamera(
-  -window.innerWidth / 2,
-  window.innerWidth / 2,
-  -window.innerHeight / 2,
-  window.innerHeight / 2,
-  -1000,
-  1000
-)
+const camera = new PerspectiveCamera()
 const texture = new TextureLoader().load('/photo0000-0222.jpg')
-texture.flipY = false
+// texture.flipY = false
 
+const controls = new OrbitControls(camera, renderer.domElement)
+// controls.listenToKeyEvents(document.documentElement)
+// controls.enableDamping = true
+// controls.maxPolarAngle = Math.PI / 2
 const mesh = new Mesh()
 mesh.geometry = createGeometry()
 mesh.material = new ShaderMaterial({
@@ -68,6 +67,13 @@ document
     progress = parseFloat((event.target as HTMLInputElement)?.value) / 1000
   })
 
+document
+  .getElementById('reset')!
+  .addEventListener('click', (event: MouseEvent): void => {
+    event.preventDefault()
+    setCamera()
+  })
+
 document.body.appendChild(renderer.domElement)
 
 scene.add(mesh)
@@ -85,6 +91,8 @@ function update(): void {
 
   material.needsUpdate = true
 
+  controls.update()
+
   renderer.render(scene, camera)
 
   requestAnimationFrame(() => {
@@ -96,15 +104,27 @@ function setCamera(
   width: number = window.innerWidth,
   height: number = window.innerHeight
 ): void {
-  const halfW = width / 2
-  const halfH = height / 2
+  // const halfW = width / 2
+  // const halfH = height / 2
 
-  camera.left = -halfW
-  camera.right = halfW
-  camera.top = -halfH
-  camera.bottom = halfH
+  // camera.left = -halfW
+  // camera.right = halfW
+  // camera.top = -halfH
+  // camera.bottom = halfH
+
+  const fov = 1
+  const fovRad = (fov / 2) * (Math.PI / 180)
+  const dist = height / 2 / Math.tan(fovRad)
+
+  camera.fov = fov
+  camera.aspect = width / height
+  camera.near = 1000
+  camera.far = dist * 2
+
+  camera.position.set((width / 2) * -1, (height / 2) * -1, dist)
 
   camera.updateProjectionMatrix()
+  controls.update()
 }
 
 function setRenderer(
