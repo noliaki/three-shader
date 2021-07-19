@@ -25,11 +25,13 @@ float rand(vec2 co) {
   return t;
 }
 
+const float ls = 1.8;
+
 void main(void) {
   float noise = snoise(vec3(vCenter.xy, time / 10.0));
   float pnoise = snoise(vec3(vUv, time / 5.0));
   // vec3 normal = normalize(vNormal);
-  float light = dot(vNormal, vec3(0.0, 0.0, 1.0));
+  float light = abs(dot(vNormal, vec3(0.0, 0.0, 1.0))) * ls;
 
   float s = vIndex / 250.0;
 
@@ -40,7 +42,7 @@ void main(void) {
 
   vec4 hsvColor = vec4(
     hsvToRgb(
-      0.7,
+      (sin(time) + 1.0 + noise * 0.5 + pnoise * 0.5) / 2.0,
       0.5,
       0.8
     ) * light,

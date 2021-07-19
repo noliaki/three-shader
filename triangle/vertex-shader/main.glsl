@@ -74,14 +74,15 @@ void main(void) {
 
   vec3 transformed = vec3(position);
 
-  vec3 orig = position - center;
+  vec3 offset = vec3(center.x + noise * 30.0, center.y + noise * 30.0, 0.0);
+  vec3 orig = position - offset;
 
-  vNormal = normalize(rotateVector(quat, normal));
+  vNormal = rotateVector(quat, normal);
   // vNormal = normal;
 
   vec4 pos = mix(
     vec4(position, 1.0),
-    vec4(rotateVector(quat, orig) + center, 1.0),
+    vec4(rotateVector(quat, orig) + offset, 1.0),
     progress
   );
 
