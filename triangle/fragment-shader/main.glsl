@@ -7,6 +7,8 @@ varying vec2 vUv;
 varying vec3 vPosition;
 varying float vIndex;
 varying vec3 vCenter;
+varying float vDiff;
+varying vec3 vNormal;
 
 vec3 hsvToRgb(float h, float s, float v){
   vec4 t = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
@@ -26,6 +28,8 @@ float rand(vec2 co) {
 void main(void) {
   float noise = snoise(vec3(vCenter.xy, time / 10.0));
   float pnoise = snoise(vec3(vUv, time / 5.0));
+  // vec3 normal = normalize(vNormal);
+  float light = dot(vNormal, vec3(0.0, 0.0, 1.0));
 
   float s = vIndex / 250.0;
 
@@ -36,10 +40,10 @@ void main(void) {
 
   vec4 hsvColor = vec4(
     hsvToRgb(
-      (sin(time) + 1.0 + noise * 0.5 + pnoise * 0.5) / 2.0,
+      0.7,
       0.5,
       0.8
-    ),
+    ) * light,
     1.0
   );
 
@@ -59,5 +63,9 @@ void main(void) {
   //   (vUv + noise * 1.5)
   // );
 
-  gl_FragColor = mix(texture2D(uTexture, vUv), hsvColor, tProgress);
+  gl_FragColor = mix(
+    texture2D(uTexture, vUv),
+    hsvColor,
+    tProgress
+  );
 }

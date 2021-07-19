@@ -119,8 +119,8 @@ function setRenderer(
 function createGeometry(
   width: number = window.innerWidth,
   height: number = window.innerHeight,
-  widthSegment: number = 70,
-  heightSegment: number = 70
+  widthSegment: number = 5,
+  heightSegment: number = 5
 ): BufferGeometry {
   const segments = widthSegment * heightSegment
 

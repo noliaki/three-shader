@@ -11,6 +11,8 @@ varying vec3 vPosition;
 varying float vIndex;
 varying vec3 vStagger;
 varying vec3 vCenter;
+varying vec3 vNormal;
+varying float vDiff;
 
 vec3 rotate3d(vec3 p, float angle, vec3 axis){
   vec3 a = normalize(axis);
@@ -48,7 +50,7 @@ void main(void) {
   vStagger = stagger;
   vCenter = center;
 
-  float noise = snoise(vec3(stagger.xy * 5.0, time / 3.0));
+  float noise = snoise(vec3(stagger.xy * 5.0, time / 30.0));
   float normalNoise = (noise + 1.0) / 2.0;
 
   float delay = (
@@ -73,6 +75,9 @@ void main(void) {
   vec3 transformed = vec3(position);
 
   vec3 orig = position - center;
+
+  vNormal = normalize(rotateVector(quat, normal));
+  // vNormal = normal;
 
   vec4 pos = mix(
     vec4(position, 1.0),
