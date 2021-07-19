@@ -87,7 +87,7 @@ function update(): void {
 
   material.uniforms.time.value += 0.01
   material.uniforms.progress.value +=
-    (progress - material.uniforms.progress.value) / 10
+    (progress - material.uniforms.progress.value) / 40
 
   material.needsUpdate = true
 
@@ -139,8 +139,8 @@ function setRenderer(
 function createGeometry(
   width: number = window.innerWidth,
   height: number = window.innerHeight,
-  widthSegment: number = 80,
-  heightSegment: number = 80
+  widthSegment: number = 120,
+  heightSegment: number = 1200
 ): BufferGeometry {
   const segments = widthSegment * heightSegment
 

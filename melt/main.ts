@@ -76,7 +76,7 @@ update()
 function update(): void {
   material.uniforms.time.value += 0.01
   material.uniforms.progress.value +=
-    (progress - material.uniforms.progress.value) / 10
+    (progress - material.uniforms.progress.value) / 60
 
   material.needsUpdate = true
 
