@@ -2,10 +2,10 @@ import './style.css'
 import {
   WebGLRenderer,
   Scene,
-  OrthographicCamera,
+  // OrthographicCamera,
   ShaderMaterial,
   Mesh,
-  PlaneBufferGeometry,
+  // PlaneBufferGeometry,
   TextureLoader,
   BufferGeometry,
   BufferAttribute,
@@ -139,8 +139,8 @@ function setRenderer(
 function createGeometry(
   width: number = window.innerWidth,
   height: number = window.innerHeight,
-  widthSegment: number = 120,
-  heightSegment: number = 1200
+  widthSegment: number = 500,
+  heightSegment: number = 500
 ): BufferGeometry {
   const segments = widthSegment * heightSegment
 
@@ -302,11 +302,6 @@ function createGeometry(
   )
 
   geometry.setIndex(index)
-
-  console.log(
-    new PlaneBufferGeometry(width, height, widthSegment, heightSegment)
-  )
-  console.log(geometry)
 
   return geometry
 }

@@ -9,6 +9,7 @@ varying float vIndex;
 varying vec3 vCenter;
 varying float vDiff;
 varying vec3 vNormal;
+varying float vProgress;
 
 vec3 hsvToRgb(float h, float s, float v){
   vec4 t = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
@@ -56,7 +57,7 @@ void main(void) {
   ) * 0.5 * (1.0 - duration);
 
 
-  float tProgress = clamp(progress - delay, 0.0, duration) / duration;
+  // float tProgress = clamp(progress - delay, 0.0, duration) / duration;
 
   // float offset = rand(vUv);
 
@@ -68,6 +69,6 @@ void main(void) {
   gl_FragColor = mix(
     texture2D(uTexture, vUv),
     hsvColor,
-    tProgress
+    vProgress
   );
 }

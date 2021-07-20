@@ -13,6 +13,7 @@ varying vec3 vStagger;
 varying vec3 vCenter;
 varying vec3 vNormal;
 varying float vDiff;
+varying float vProgress;
 
 vec3 rotate3d(vec3 p, float angle, vec3 axis){
   vec3 a = normalize(axis);
@@ -43,6 +44,15 @@ vec4 quatFromAxisAngle(vec3 axis, float angle) {
   return vec4(axis.xyz * sin(halfAngle), cos(halfAngle));
 }
 
+vec3 bezier(vec3 A, vec3 B, vec3 C, float t) {
+  vec3 D = mix(A, B, t);
+  vec3 E = mix(B, C, t);
+
+  vec3 F = mix(D, E, t);
+
+  return F;
+}
+
 vec3 bezier(vec3 A, vec3 B, vec3 C, vec3 D, float t) {
   vec3 E = mix(A, B, t);
   vec3 F = mix(B, C, t);
@@ -56,6 +66,35 @@ vec3 bezier(vec3 A, vec3 B, vec3 C, vec3 D, float t) {
   return P;
 }
 
+vec3 cubicBezier(vec3 p0, vec3 c0, vec3 c1, vec3 p1, float t) {
+  float tn = 1.0 - t;
+
+  return (
+    tn * tn * tn * p0 +
+    3.0 * tn * tn * t * c0 +
+    3.0 * tn * t * t * c1 +
+    t * t * t * p1
+  );
+}
+
+vec3 cubicBezier(vec3 p0, vec3 c0, vec3 c1, vec3 c2, vec3 p1, float t) {
+  float tn = 1.0 - t;
+
+  return (
+    tn * tn * tn * tn * p0 +
+    4.0 * tn * tn * tn * t * c0 +
+    4.0 * tn * tn * t * t * c1 +
+    4.0 * tn * t * t * t * c2 +
+    t * t * t * t * p1
+  );
+}
+
+vec3 quadraticBezier(vec3 p0, vec3 c0, vec3 p1, float t) {
+  float tn = 1.0 - t;
+
+  return tn * tn * p0 + 2.0 * tn * t * c0 + t * t * p1;
+}
+
 void main(void) {
   vUv = uv;
   vPosition = position;
@@ -65,9 +104,9 @@ void main(void) {
 
   float noise = snoise(vec3(stagger.xy * 5.0, time / 5.0));
   float normalNoise = (noise + 1.0) / 2.0;
-  float positionNoiseX = snoise(vec3(center.xy, time / 10.0));
-  float positionNoiseY = snoise(vec3(center.yz, time / 10.0));
-  float positionNoiseZ = snoise(vec3(center.zx, time / 10.0));
+  float positionNoiseX = snoise(vec3(center.x, center.y, time / 10.0));
+  float positionNoiseY = snoise(vec3(center.y, center.x, time / 10.0));
+  float positionNoiseZ = snoise(vec3(center.x, center.y, time / 5.0));
 
   float delay = (
     ((position.x / (resolution.x * 0.5)) + 1.0) * 0.5 +
@@ -91,22 +130,17 @@ void main(void) {
 
   vec3 orig = position - center;
   vec3 transformed = rotateVector(quat, orig) + center;
-  vec3 offset = bezier(
-    vec3(
-      positionNoiseX * center * 6.0
-    ),
-    vec3(
-      positionNoiseY * center* 6.0
-    ),
-    vec3(
-      positionNoiseZ * center* 6.0
-    ),
-    vec3(positionNoiseX * center* 6.0
-    ),
+  vec3 offset = cubicBezier(
+    vec3(positionNoiseX * 1000.0, positionNoiseY * 1000.0, positionNoiseZ * 1000.0),
+    vec3((center * 10.0).xy, positionNoiseX * 1000.0),
+    vec3((center * -50.0).xy, positionNoiseY * 1000.0),
+    vec3((center * -8.0).xy, positionNoiseZ * 1000.0),
+    vec3(positionNoiseZ * 300.0, positionNoiseX * 300.0, positionNoiseY * 300.0),
     tProgress
   );
 
   vNormal = normalize(rotateVector(quat, normal));
+  vProgress = tProgress;
   // vNormal = normal;
 
   vec3 pos = mix(
