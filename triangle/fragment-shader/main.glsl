@@ -31,10 +31,7 @@ const float ls = 1.8;
 void main(void) {
   float noise = snoise(vec3(vCenter.xy, time / 10.0));
   float pnoise = snoise(vec3(vUv, time / 5.0));
-  // vec3 normal = normalize(vNormal);
   float light = abs(dot(vNormal, vec3(0.0, 0.0, 1.0))) * ls;
-
-  float s = vIndex / 250.0;
 
   vec2 p = vec2(
     ((vPosition.x + (resolution.x / 2.0)) / 2.0) / resolution.x,
@@ -49,22 +46,6 @@ void main(void) {
     ) * light,
     1.0
   );
-
-  float duration = 0.5;
-  float delay = (
-    ((vPosition.x / (resolution.x * 0.5)) + 1.0) * 0.5 +
-    ((vPosition.y / (resolution.y * 0.5)) + 1.0) * 0.5
-  ) * 0.5 * (1.0 - duration);
-
-
-  // float tProgress = clamp(progress - delay, 0.0, duration) / duration;
-
-  // float offset = rand(vUv);
-
-  // vec4 color = texture2D(
-  //   uTexture,
-  //   (vUv + noise * 1.5)
-  // );
 
   gl_FragColor = mix(
     texture2D(uTexture, vUv),

@@ -10,5 +10,10 @@ module.exports = {
         crystal: resolve(__dirname, 'crystal/index.html'),
       },
     },
+    terserOptions: {
+      compress: {
+        drop_console: process.env.NODE_ENV === 'production',
+      },
+    },
   },
 }
