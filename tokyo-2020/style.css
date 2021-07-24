@@ -1,0 +1,31 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #000;
+}
+
+canvas {
+  display: block;
+}
+
+input {
+  position: fixed;
+  right: 0;
+  bottom: 40px;
+  left: 0;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+button {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin-right: auto;
+  margin-left: auto;
+}

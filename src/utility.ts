@@ -11,3 +11,31 @@ export function debounce(cb: (...args: any) => void, interval: number = 300) {
     }, interval)
   }
 }
+
+export function loadImg(imgSrc: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject): void => {
+    const img = new Image()
+
+    img.addEventListener(
+      'load',
+      (_event: Event): void => {
+        resolve(img)
+      },
+      {
+        once: true,
+      }
+    )
+
+    img.addEventListener(
+      'error',
+      (event: Event): void => {
+        reject(event)
+      },
+      {
+        once: true,
+      }
+    )
+
+    img.src = imgSrc
+  })
+}

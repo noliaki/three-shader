@@ -8,6 +8,7 @@ module.exports = {
         melt: resolve(__dirname, 'melt/index.html'),
         triangle: resolve(__dirname, 'triangle/index.html'),
         crystal: resolve(__dirname, 'crystal/index.html'),
+        'tokyo-2020': resolve(__dirname, 'tokyo-2020/index.html'),
       },
     },
     terserOptions: {
