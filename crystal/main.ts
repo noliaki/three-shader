@@ -11,6 +11,7 @@ import {
   BufferAttribute,
   DoubleSide,
   OctahedronGeometry,
+  MeshToonMaterial,
 } from 'three'
 import { debounce } from '../src/utility'
 import vertexShader from './vertex-shader'

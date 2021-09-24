@@ -15,8 +15,13 @@ float rand(vec2 co) {
 
 void main(void) {
   float noise = snoise(
-    vec3(vUv / 1.4, time / (4.0 - (progress * 2.0)))
+    vec3(vUv / 1.4, time / 2.0)
   );
+
+  float offset = snoise(vec3(
+    vUv + noise * 0.01 * progress,
+    time * noise * 0.7 * progress
+  ));
 
   // float offset = rand(vUv);
 
@@ -25,5 +30,5 @@ void main(void) {
   //   (vUv + noise * 1.5)
   // );
 
-  gl_FragColor = texture2D(uTexture, (vUv + noise * 2.0 * progress));
+  gl_FragColor = texture2D(uTexture, (vUv + offset * 2.0 * progress));
 }

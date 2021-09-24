@@ -9,6 +9,7 @@ module.exports = {
         triangle: resolve(__dirname, 'triangle/index.html'),
         crystal: resolve(__dirname, 'crystal/index.html'),
         'tokyo-2020': resolve(__dirname, 'tokyo-2020/index.html'),
+        effect: resolve(__dirname, 'effect/index.html'),
       },
     },
     terserOptions: {
