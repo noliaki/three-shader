@@ -42,7 +42,7 @@ const point = (() => {
       resolution: {
         value: [1024, 1024],
       },
-      progress: {
+      uProgress: {
         value: 0,
       },
     },
@@ -87,6 +87,9 @@ const renderTargets: {
           value: new Texture(),
           // value: renderTargets[currentRenderIndex].target.texture,
         },
+        uProgress: {
+          value: 0,
+        },
       },
       vertexShader: `
 uniform sampler2D uTexture;
@@ -101,9 +104,10 @@ void main(void) {
 varying vec2 vUv;
 uniform sampler2D uTexture;
 uniform sampler2D uPrevTexture;
+uniform float uProgress;
 
 void main(void) {
-  vec4 prevColor = texture2D(uPrevTexture, vUv) - 0.008;
+  vec4 prevColor = texture2D(uPrevTexture, vUv) - (0.008 * uProgress + 0.005);
 
   vec4 color = texture2D(uTexture, vUv);
 
@@ -216,6 +220,7 @@ function update(): void {
   renderer.setRenderTarget(nextTarget)
   nextMaterial.uniforms.uPrevTexture.value = currentTarget.texture
   nextMaterial.uniforms.uTexture.value = pointRenderTarget.texture
+  nextMaterial.uniforms.uProgress.value = progress
   renderer.render(nextScene, camera)
 
   renderer.setRenderTarget(null)
