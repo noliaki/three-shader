@@ -6,20 +6,11 @@ import {
   ShaderMaterial,
   Mesh,
   PlaneBufferGeometry,
-  TextureLoader,
   BufferGeometry,
   BufferAttribute,
-  DoubleSide,
-  SphereGeometry,
-  MeshNormalMaterial,
   WebGLRenderTarget,
-  PointsMaterial,
   Points,
-  MeshBasicMaterial,
-  NearestFilter,
-  ClampToEdgeWrapping,
   Texture,
-  MeshStandardMaterial,
 } from 'three'
 import { debounce } from '../src/utility'
 import vertexShader from './vertex-shader'
@@ -112,12 +103,11 @@ uniform sampler2D uTexture;
 uniform sampler2D uPrevTexture;
 
 void main(void) {
-  vec4 prevColor = texture2D(uPrevTexture, vUv) - 0.005;
+  vec4 prevColor = texture2D(uPrevTexture, vUv) - 0.008;
 
   vec4 color = texture2D(uTexture, vUv);
 
   gl_FragColor = prevColor.a > color.a ? prevColor : color;
-  // gl_FragColor = (prevColor + color);
 }
     `,
     })

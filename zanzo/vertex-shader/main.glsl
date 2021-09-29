@@ -42,7 +42,8 @@ void main(void) {
     position.y + noiseY * (100.0 + noise * 100.0),
     0.0
   );
-  gl_PointSize = 1.0 + (sin(uTime * 0.0003 + (noise + 1.0) * 0.5 * 10.0) + 1.0) * 0.5 * 20.0;
+
+  gl_PointSize = 1.0 + ((noise + 1.0) * 0.5) * 50.0;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
 
   vUv = uv;
