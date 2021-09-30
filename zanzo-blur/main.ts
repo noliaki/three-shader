@@ -128,6 +128,7 @@ void main(void) {
 
 const blurRenderTargets = new Array(2).fill(0).map((_) => {
   const blurVol = 10
+  const defaultDistance = 50
 
   const calc = (i: number, d: number): number => {
     const r = 1 + 2 * i
@@ -136,7 +137,7 @@ const blurRenderTargets = new Array(2).fill(0).map((_) => {
     return w
   }
 
-  const getWeight = (distance: number = 0.001, vol = blurVol) => {
+  const getWeight = (distance: number = defaultDistance, vol = blurVol) => {
     const t = new Array(vol).fill(0).reduce((acc, _curr, i) => {
       const w = calc(i, distance)
 
@@ -148,7 +149,7 @@ const blurRenderTargets = new Array(2).fill(0).map((_) => {
     return new Array(vol).fill(0).map((_, i) => calc(i, distance) / t)
   }
 
-  const updataWeight = (distance: number = 0.001) => {
+  const updataWeight = (distance: number = defaultDistance) => {
     material.uniforms.uWeight.value = getWeight(distance)
   }
 
@@ -326,7 +327,6 @@ function update(): void {
   renderer.render(nextScene, camera)
 
   mainMesh.material.uniforms.uResultTexture.value = nextTarget.texture
-  // mainMesh.material.uniforms.uResultTexture.value = pointRenderTarget.texture
   renderer.setRenderTarget(null)
   renderer.render(mainScene, camera)
 
