@@ -16,23 +16,6 @@ import { debounce } from '../src/utility'
 import vertexShader from './vertex-shader'
 import fragmentShader from './fragment-shader'
 
-const distance = 10
-
-const t = new Array(10).fill(0).reduce((acc, _curr, i) => {
-  const r = 1 + 2 * i
-  const w = Math.exp((-0.5 * (r * r)) / distance)
-
-  acc += i > 0 ? w * 2 : w
-
-  return acc
-}, 0)
-
-const weight = new Array(10).fill(0).map((_, i) => {
-  const r = 1 + 2 * i
-
-  return Math.exp((-0.5 * (r * r)) / distance) / t
-})
-
 const startTime = Date.now()
 const camera = new OrthographicCamera(
   -window.innerWidth / 2,
@@ -98,11 +81,9 @@ const renderTargets: {
       uniforms: {
         uTexture: {
           value: new Texture(),
-          // value: renderTargets[currentRenderIndex].target.texture,
         },
         uPrevTexture: {
           value: new Texture(),
-          // value: renderTargets[currentRenderIndex].target.texture,
         },
         uProgress: {
           value: 0,
@@ -133,17 +114,7 @@ void main(void) {
     })
     const mesh = new Mesh(geometry, material)
     const scene = new Scene()
-    const target = new WebGLRenderTarget(
-      window.innerWidth,
-      window.innerHeight
-      // {
-      //   depthBuffer: false,
-      //   stencilBuffer: false,
-      //   // magFilter: NearestFilter,
-      //   // minFilter: NearestFilter,
-      //   // wrapS: ClampToEdgeWrapping,
-      // }
-    )
+    const target = new WebGLRenderTarget(window.innerWidth, window.innerHeight)
 
     scene.add(mesh)
 
@@ -156,6 +127,31 @@ void main(void) {
   })
 
 const blurRenderTargets = new Array(2).fill(0).map((_) => {
+  const blurVol = 10
+
+  const calc = (i: number, d: number): number => {
+    const r = 1 + 2 * i
+    const w = Math.exp((-0.5 * (r * r)) / d)
+
+    return w
+  }
+
+  const getWeight = (distance: number = 0.001, vol = blurVol) => {
+    const t = new Array(vol).fill(0).reduce((acc, _curr, i) => {
+      const w = calc(i, distance)
+
+      acc += i > 0 ? w * 2 : w
+
+      return acc
+    }, 0)
+
+    return new Array(vol).fill(0).map((_, i) => calc(i, distance) / t)
+  }
+
+  const updataWeight = (distance: number = 0.001) => {
+    material.uniforms.uWeight.value = getWeight(distance)
+  }
+
   const geometry = new PlaneBufferGeometry(
     window.innerWidth,
     window.innerHeight,
@@ -166,11 +162,9 @@ const blurRenderTargets = new Array(2).fill(0).map((_) => {
     uniforms: {
       uBlurTexture: {
         value: new Texture(),
-        // value: renderTargets[currentRenderIndex].target.texture,
       },
       uWeight: {
-        value: weight,
-        // value: renderTargets[currentRenderIndex].target.texture,
+        value: getWeight(),
       },
       uIsHorizontal: {
         value: false,
@@ -190,55 +184,21 @@ uniform sampler2D uBlurTexture;
 uniform float uWeight[10];
 uniform vec2 uResolution;
 
-// const float[10] weights = float[](0.9646517207363228, 0.017668212570402537, 0.000005927025019207429, 3.641690034149965, 4.0981822426645104, 8.446983174881328, 3.188849797843883, 2.204898338322799, 2.792319757544259, 6.476849426964096);
-
 void main(void) {
   vec2 tFrag = 1.0 / uResolution;
-  vec2 fc;
-  vec3 destColor = vec3(0.0);
+  vec2 fc = gl_FragCoord.xy;
+  vec3 destColor = texture2D(uBlurTexture, fc * tFrag).rgb * uWeight[0];
 
   if (uIsHorizontal) {
-    fc = vec2(gl_FragCoord.s, gl_FragCoord.t);
-    destColor += texture2D(uBlurTexture, (fc + vec2(-9.0, 0.0)) * tFrag).rgb * uWeight[9];
-    destColor += texture2D(uBlurTexture, (fc + vec2(-8.0, 0.0)) * tFrag).rgb * uWeight[8];
-    destColor += texture2D(uBlurTexture, (fc + vec2(-7.0, 0.0)) * tFrag).rgb * uWeight[7];
-    destColor += texture2D(uBlurTexture, (fc + vec2(-6.0, 0.0)) * tFrag).rgb * uWeight[6];
-    destColor += texture2D(uBlurTexture, (fc + vec2(-5.0, 0.0)) * tFrag).rgb * uWeight[5];
-    destColor += texture2D(uBlurTexture, (fc + vec2(-4.0, 0.0)) * tFrag).rgb * uWeight[4];
-    destColor += texture2D(uBlurTexture, (fc + vec2(-3.0, 0.0)) * tFrag).rgb * uWeight[3];
-    destColor += texture2D(uBlurTexture, (fc + vec2(-2.0, 0.0)) * tFrag).rgb * uWeight[2];
-    destColor += texture2D(uBlurTexture, (fc + vec2(-1.0, 0.0)) * tFrag).rgb * uWeight[1];
-    destColor += texture2D(uBlurTexture, (fc + vec2( 0.0, 0.0)) * tFrag).rgb * uWeight[0];
-    destColor += texture2D(uBlurTexture, (fc + vec2( 1.0, 0.0)) * tFrag).rgb * uWeight[1];
-    destColor += texture2D(uBlurTexture, (fc + vec2( 2.0, 0.0)) * tFrag).rgb * uWeight[2];
-    destColor += texture2D(uBlurTexture, (fc + vec2( 3.0, 0.0)) * tFrag).rgb * uWeight[3];
-    destColor += texture2D(uBlurTexture, (fc + vec2( 4.0, 0.0)) * tFrag).rgb * uWeight[4];
-    destColor += texture2D(uBlurTexture, (fc + vec2( 5.0, 0.0)) * tFrag).rgb * uWeight[5];
-    destColor += texture2D(uBlurTexture, (fc + vec2( 6.0, 0.0)) * tFrag).rgb * uWeight[6];
-    destColor += texture2D(uBlurTexture, (fc + vec2( 7.0, 0.0)) * tFrag).rgb * uWeight[7];
-    destColor += texture2D(uBlurTexture, (fc + vec2( 8.0, 0.0)) * tFrag).rgb * uWeight[8];
-    destColor += texture2D(uBlurTexture, (fc + vec2( 9.0, 0.0)) * tFrag).rgb * uWeight[9];
+    for (int i = 1; i < 10; i++) {
+      destColor += texture2D(uBlurTexture, (fc + vec2(float(i), 0.0)) * tFrag).rgb * uWeight[i];
+      destColor += texture2D(uBlurTexture, (fc + vec2(float(i) * -1.0, 0.0)) * tFrag).rgb * uWeight[i];
+    }
   } else {
-    fc = gl_FragCoord.st;
-    destColor += texture2D(uBlurTexture, (fc + vec2(0.0, -9.0)) * tFrag).rgb * uWeight[9];
-    destColor += texture2D(uBlurTexture, (fc + vec2(0.0, -8.0)) * tFrag).rgb * uWeight[8];
-    destColor += texture2D(uBlurTexture, (fc + vec2(0.0, -7.0)) * tFrag).rgb * uWeight[7];
-    destColor += texture2D(uBlurTexture, (fc + vec2(0.0, -6.0)) * tFrag).rgb * uWeight[6];
-    destColor += texture2D(uBlurTexture, (fc + vec2(0.0, -5.0)) * tFrag).rgb * uWeight[5];
-    destColor += texture2D(uBlurTexture, (fc + vec2(0.0, -4.0)) * tFrag).rgb * uWeight[4];
-    destColor += texture2D(uBlurTexture, (fc + vec2(0.0, -3.0)) * tFrag).rgb * uWeight[3];
-    destColor += texture2D(uBlurTexture, (fc + vec2(0.0, -2.0)) * tFrag).rgb * uWeight[2];
-    destColor += texture2D(uBlurTexture, (fc + vec2(0.0, -1.0)) * tFrag).rgb * uWeight[1];
-    destColor += texture2D(uBlurTexture, (fc + vec2(0.0,  0.0)) * tFrag).rgb * uWeight[0];
-    destColor += texture2D(uBlurTexture, (fc + vec2(0.0,  1.0)) * tFrag).rgb * uWeight[1];
-    destColor += texture2D(uBlurTexture, (fc + vec2(0.0,  2.0)) * tFrag).rgb * uWeight[2];
-    destColor += texture2D(uBlurTexture, (fc + vec2(0.0,  3.0)) * tFrag).rgb * uWeight[3];
-    destColor += texture2D(uBlurTexture, (fc + vec2(0.0,  4.0)) * tFrag).rgb * uWeight[4];
-    destColor += texture2D(uBlurTexture, (fc + vec2(0.0,  5.0)) * tFrag).rgb * uWeight[5];
-    destColor += texture2D(uBlurTexture, (fc + vec2(0.0,  6.0)) * tFrag).rgb * uWeight[6];
-    destColor += texture2D(uBlurTexture, (fc + vec2(0.0,  7.0)) * tFrag).rgb * uWeight[7];
-    destColor += texture2D(uBlurTexture, (fc + vec2(0.0,  8.0)) * tFrag).rgb * uWeight[8];
-    destColor += texture2D(uBlurTexture, (fc + vec2(0.0,  9.0)) * tFrag).rgb * uWeight[9];
+    for (int i = 1; i < 10; i++) {
+      destColor += texture2D(uBlurTexture, (fc + vec2(0.0, float(i))) * tFrag).rgb * uWeight[i];
+      destColor += texture2D(uBlurTexture, (fc + vec2(0.0, float(i) * -1.0)) * tFrag).rgb * uWeight[i];
+    }
   }
 
   gl_FragColor = vec4(destColor, 1.0);
@@ -247,17 +207,7 @@ void main(void) {
   })
   const mesh = new Mesh(geometry, material)
   const scene = new Scene()
-  const target = new WebGLRenderTarget(
-    window.innerWidth,
-    window.innerHeight
-    // {
-    //   depthBuffer: false,
-    //   stencilBuffer: false,
-    //   // magFilter: NearestFilter,
-    //   // minFilter: NearestFilter,
-    //   // wrapS: ClampToEdgeWrapping,
-    // }
-  )
+  const target = new WebGLRenderTarget(window.innerWidth, window.innerHeight)
 
   scene.add(mesh)
 
@@ -266,6 +216,7 @@ void main(void) {
     scene,
     geometry,
     material,
+    updataWeight,
   }
 })
 
@@ -275,8 +226,6 @@ let progress = 0
 window.addEventListener(
   'resize',
   debounce((_event: Event): void => {
-    // points.geometry = createGeometry()
-
     setCamera()
     setRenderer()
   })
@@ -285,7 +234,11 @@ window.addEventListener(
 document
   .getElementById('range')
   ?.addEventListener('input', (event: Event): void => {
-    progress = parseFloat((event.target as HTMLInputElement)?.value) / 1000
+    progress = parseFloat((event.target as HTMLInputElement)?.value)
+
+    blurRenderTargets.forEach(({ updataWeight }) => {
+      updataWeight(progress)
+    })
   })
 
 document.body.appendChild(renderer.domElement)
