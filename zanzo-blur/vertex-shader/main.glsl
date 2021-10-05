@@ -1,6 +1,6 @@
 uniform float uTime;
 
-varying vec2 vUv;
+// varying vec2 vUv;
 varying vec3 vPosition;
 
 vec3 rotate3d(vec3 p, float angle, vec3 axis){
@@ -46,6 +46,6 @@ void main(void) {
   gl_PointSize = 1.0 + ((noise + 1.0) * 0.5) * 50.0;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
 
-  vUv = uv;
+  // vUv = uv;
   vPosition = position;
 }

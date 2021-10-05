@@ -11,10 +11,17 @@ import {
   WebGLRenderTarget,
   Points,
   Texture,
+  MeshBasicMaterial,
 } from 'three'
 import { debounce } from '../src/utility'
 import vertexShader from './vertex-shader'
 import fragmentShader from './fragment-shader'
+
+import resultVertexShader from './vertex-shader/result'
+import resultFragmentShader from './fragment-shader/result'
+
+import { zanzoVertexShader } from './vertex-shader/zanzo'
+import { zanzoFragmentShader } from './fragment-shader/zanzo'
 
 const startTime = Date.now()
 const camera = new OrthographicCamera(
@@ -89,28 +96,8 @@ const renderTargets: {
           value: 0,
         },
       },
-      vertexShader: `
-uniform sampler2D uTexture;
-varying vec2 vUv;
-
-void main(void) {
-  vUv = uv;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}
-`,
-      fragmentShader: `
-varying vec2 vUv;
-uniform sampler2D uTexture;
-uniform sampler2D uPrevTexture;
-uniform float uProgress;
-
-void main(void) {
-  vec4 prevColor = texture2D(uPrevTexture, vUv) - 0.006;
-  vec4 color = texture2D(uTexture, vUv);
-
-  gl_FragColor = prevColor.a > color.a ? prevColor : color;
-}
-    `,
+      vertexShader: zanzoVertexShader,
+      fragmentShader: zanzoFragmentShader,
     })
     const mesh = new Mesh(geometry, material)
     const scene = new Scene()
@@ -190,16 +177,11 @@ void main(void) {
   vec2 fc = gl_FragCoord.xy;
   vec3 destColor = texture2D(uBlurTexture, fc * tFrag).rgb * uWeight[0];
 
-  if (uIsHorizontal) {
-    for (int i = 1; i < 10; i++) {
-      destColor += texture2D(uBlurTexture, (fc + vec2(float(i), 0.0)) * tFrag).rgb * uWeight[i];
-      destColor += texture2D(uBlurTexture, (fc + vec2(float(i) * -1.0, 0.0)) * tFrag).rgb * uWeight[i];
-    }
-  } else {
-    for (int i = 1; i < 10; i++) {
-      destColor += texture2D(uBlurTexture, (fc + vec2(0.0, float(i))) * tFrag).rgb * uWeight[i];
-      destColor += texture2D(uBlurTexture, (fc + vec2(0.0, float(i) * -1.0)) * tFrag).rgb * uWeight[i];
-    }
+  for (int i = 1; i < 10; i++) {
+    vec2 dfc = uIsHorizontal ? vec2(float(i), 0.0) : vec2(0.0, float(i));
+
+    destColor += texture2D(uBlurTexture, (fc + dfc) * tFrag).rgb * uWeight[i];
+    destColor += texture2D(uBlurTexture, (fc + dfc * -1.0) * tFrag).rgb * uWeight[i];
   }
 
   gl_FragColor = vec4(destColor, 1.0);
@@ -249,45 +231,39 @@ const mainMesh = new Mesh(
   new PlaneBufferGeometry(window.innerWidth, window.innerHeight, 1, 1),
   new ShaderMaterial({
     uniforms: {
-      uResultTexture: {
+      uZanzoTexture: {
         value: point.renderTarget.texture,
       },
     },
-    vertexShader: `
-varying vec2 vUv;
+    vertexShader: resultVertexShader,
+    fragmentShader: resultFragmentShader,
+  })
+)
 
-void main(void) {
-  vUv = uv;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}
-`,
-    fragmentShader: `
-varying vec2 vUv;
-uniform sampler2D uResultTexture;
-
-void main(void) {
-
-  gl_FragColor = texture2D(uResultTexture, vUv);
-}
-    `,
+const pointMesh = new Mesh(
+  new PlaneBufferGeometry(window.innerWidth, window.innerHeight, 1, 1),
+  new MeshBasicMaterial({
+    map: point.renderTarget.texture,
+    transparent: true,
   })
 )
 
 mainScene.add(mainMesh)
+mainScene.add(pointMesh)
 
 setCamera()
 setRenderer()
 update()
 
 function update(): void {
+  const time = Date.now() - startTime
   const {
     material: pointMaterial,
     renderTarget: pointRenderTarget,
     scene: pointScene,
   } = point
 
-  pointMaterial.uniforms.uTime.value = Date.now() - startTime
-
+  pointMaterial.uniforms.uTime.value = time
   renderer.setRenderTarget(pointRenderTarget)
   renderer.render(pointScene, camera)
 
@@ -326,7 +302,8 @@ function update(): void {
   renderer.setRenderTarget(nextTarget)
   renderer.render(nextScene, camera)
 
-  mainMesh.material.uniforms.uResultTexture.value = nextTarget.texture
+  mainMesh.material.uniforms.uZanzoTexture.value = nextTarget.texture
+
   renderer.setRenderTarget(null)
   renderer.render(mainScene, camera)
 
