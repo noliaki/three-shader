@@ -11,6 +11,7 @@ module.exports = {
         'tokyo-2020': resolve(__dirname, 'tokyo-2020/index.html'),
         zanzo: resolve(__dirname, 'zanzo/index.html'),
         'zanzo-blur': resolve(__dirname, 'zanzo-blur/index.html'),
+        'zanzo-blur-step': resolve(__dirname, 'zanzo-blur-step/index.html'),
       },
     },
     terserOptions: {
