@@ -22,6 +22,9 @@ import resultFragmentShader from './fragment-shader/result'
 
 import { zanzoVertexShader } from './vertex-shader/zanzo'
 import { zanzoFragmentShader } from './fragment-shader/zanzo'
+import { Pane } from 'tweakpane'
+
+const pane = new Pane()
 
 const startTime = Date.now()
 const camera = new OrthographicCamera(
@@ -114,8 +117,8 @@ const renderTargets: {
   })
 
 const blurRenderTargets = new Array(2).fill(0).map((_) => {
-  const blurVol = 10
-  const defaultDistance = 50
+  let blurVol = 10
+  let defaultDistance = 50
 
   const calc = (i: number, d: number): number => {
     const r = 1 + 2 * i
@@ -124,7 +127,12 @@ const blurRenderTargets = new Array(2).fill(0).map((_) => {
     return w
   }
 
-  const getWeight = (distance: number = defaultDistance, vol = blurVol) => {
+  const getWeight = (
+    { distance = defaultDistance, vol = blurVol } = {
+      distance: defaultDistance,
+      vol: blurVol,
+    }
+  ) => {
     const t = new Array(vol).fill(0).reduce((acc, _curr, i) => {
       const w = calc(i, distance)
 
@@ -136,8 +144,22 @@ const blurRenderTargets = new Array(2).fill(0).map((_) => {
     return new Array(vol).fill(0).map((_, i) => calc(i, distance) / t)
   }
 
-  const updataWeight = (distance: number = defaultDistance) => {
-    material.uniforms.uWeight.value = getWeight(distance)
+  const updataWeight = ({
+    distance,
+    vol,
+  }: {
+    distance?: number
+    vol?: number
+  }) => {
+    defaultDistance = distance ?? defaultDistance
+    blurVol = vol ?? blurVol
+
+    material.uniforms.uWeight.value = getWeight({
+      distance: defaultDistance,
+      vol: blurVol,
+    })
+
+    material.uniforms.uBlurTimes.value = blurVol
   }
 
   const geometry = new PlaneBufferGeometry(
@@ -160,6 +182,9 @@ const blurRenderTargets = new Array(2).fill(0).map((_) => {
       uResolution: {
         value: [window.innerWidth, window.innerHeight],
       },
+      uBlurTimes: {
+        value: 10,
+      },
     },
     vertexShader: `
 void main(void) {
@@ -169,8 +194,9 @@ void main(void) {
     fragmentShader: `
 uniform bool uIsHorizontal;
 uniform sampler2D uBlurTexture;
-uniform float uWeight[10];
+uniform float uWeight[100];
 uniform vec2 uResolution;
+uniform int uBlurTimes;
 
 void main(void) {
   vec2 tFrag = 1.0 / uResolution;
@@ -214,16 +240,6 @@ window.addEventListener(
   })
 )
 
-document
-  .getElementById('range')
-  ?.addEventListener('input', (event: Event): void => {
-    progress = parseFloat((event.target as HTMLInputElement)?.value)
-
-    blurRenderTargets.forEach(({ updataWeight }) => {
-      updataWeight(progress)
-    })
-  })
-
 document.body.appendChild(renderer.domElement)
 
 const mainScene = new Scene()
@@ -254,6 +270,49 @@ mainScene.add(pointMesh)
 setCamera()
 setRenderer()
 update()
+
+pane
+  .addInput(
+    {
+      blurR: 10,
+    },
+    'blurR',
+    {
+      step: 1,
+      min: 1,
+      max: 100,
+    }
+  )
+  .on('change', (event) => {
+    console.log(event.value)
+
+    blurRenderTargets.forEach((target) => {
+      target.updataWeight({
+        distance: event.value,
+      })
+    })
+  })
+pane
+  .addInput(
+    {
+      vol: 10,
+    },
+    'vol',
+    {
+      step: 1,
+      min: 10,
+      max: 100,
+    }
+  )
+  .on('change', (event) => {
+    console.log(event.value)
+
+    blurRenderTargets.forEach((target) => {
+      target.updataWeight({
+        vol: event.value,
+      })
+    })
+  })
 
 function update(): void {
   const time = Date.now() - startTime
