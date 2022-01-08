@@ -12,6 +12,7 @@ module.exports = {
         zanzo: resolve(__dirname, 'zanzo/index.html'),
         'zanzo-blur': resolve(__dirname, 'zanzo-blur/index.html'),
         'zanzo-blur-step': resolve(__dirname, 'zanzo-blur-step/index.html'),
+        'p-1': resolve(__dirname, 'p-1/index.html'),
       },
     },
     terserOptions: {
