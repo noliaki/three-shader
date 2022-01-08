@@ -15,6 +15,10 @@ import {
 import { debounce } from '../src/utility'
 import vertexShader from './vertex-shader'
 import fragmentShader from './fragment-shader'
+import Stats from 'three/examples/jsm/libs/stats.module'
+
+const stats = Stats()
+document.body.appendChild(stats.dom)
 
 const startTime = Date.now()
 const camera = new OrthographicCamera(
@@ -229,6 +233,8 @@ function update(): void {
   renderer.render(mainScene, camera)
 
   currentRenderIndex = nextRenderIndex
+
+  stats.update()
 
   requestAnimationFrame(() => {
     update()

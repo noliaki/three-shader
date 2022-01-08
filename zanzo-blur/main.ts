@@ -23,6 +23,10 @@ import resultFragmentShader from './fragment-shader/result'
 import { zanzoVertexShader } from './vertex-shader/zanzo'
 import { zanzoFragmentShader } from './fragment-shader/zanzo'
 import { Pane } from 'tweakpane'
+import Stats from 'three/examples/jsm/libs/stats.module'
+
+const stats = Stats()
+document.body.appendChild(stats.dom)
 
 const pane = new Pane()
 
@@ -367,6 +371,8 @@ function update(): void {
   renderer.render(mainScene, camera)
 
   currentRenderIndex = nextRenderIndex
+
+  stats.update()
 
   requestAnimationFrame(() => {
     update()

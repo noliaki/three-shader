@@ -43,7 +43,7 @@ void main(void) {
     0.0
   );
 
-  gl_PointSize = 1.0 + ((noise + 1.0) * 0.5) * 50.0;
+  gl_PointSize = 1.0 + ((noise + 1.0) * 0.5) * 30.0;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
 
   // vUv = uv;
