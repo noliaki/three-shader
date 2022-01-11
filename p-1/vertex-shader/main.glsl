@@ -38,12 +38,17 @@ void main(void) {
   float noiseY = snoise(vec3(position.yx, uTime * 0.0005));
 
   vec3 pos = vec3(
-    position.x + noiseX * (100.0 + noise * 100.0),
-    position.y + noiseY * (100.0 + noise * 100.0),
+    position.x + sin(uTime * 0.001) * 500.0 + noise * 100.0,
+    position.y - sin(uTime * 0.0013) * 200.0 + noiseY * 140.0,
     0.0
   );
+  // vec3 pos = vec3(
+  //   position.x + noiseX * (100.0 + noise * 100.0),
+  //   position.y + noiseY * (100.0 + noise * 100.0),
+  //   0.0
+  // );
 
-  gl_PointSize = 1.0 + ((noise + 1.0) * 0.5) * 30.0;
+  gl_PointSize = 1.0 + ((noise + 1.0) * 0.5) * 10.0;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
 
   // vUv = uv;

@@ -47,9 +47,35 @@ const camera = new OrthographicCamera(
 )
 
 const renderer = new WebGLRenderer()
-const bgRenderer = new WebGLRenderer()
+const bgRenderer = new WebGLRenderer({
+  preserveDrawingBuffer: true,
+})
 
 bgRenderer.setPixelRatio(0.5)
+
+const createGeometry = (
+  width: number = window.innerWidth,
+  height: number = window.innerHeight
+) => {
+  const position = []
+
+  for (let i: number = 0; i < 200; i++) {
+    position.push(
+      Math.random() * -width + width * 0.5,
+      Math.random() * -height + height * 0.5,
+      0
+    )
+  }
+
+  const geometry = new BufferGeometry()
+
+  geometry.setAttribute(
+    'position',
+    new BufferAttribute(new Float32Array(position), 3)
+  )
+
+  return geometry
+}
 
 const point = (() => {
   const renderTarget = new WebGLRenderTarget(winWidth, winHeight)
@@ -231,6 +257,9 @@ const mainMesh = new Mesh(
   new ShaderMaterial({
     uniforms: {
       uZanzoTexture: {
+        value: blurRenderTargets[1].target.texture,
+      },
+      uPointTexture: {
         value: point.renderTarget.texture,
       },
     },
@@ -239,16 +268,102 @@ const mainMesh = new Mesh(
   })
 )
 
-const pointMesh = new Mesh(
-  new PlaneBufferGeometry(winWidth, winHeight, 1, 1),
-  new MeshBasicMaterial({
-    map: point.renderTarget.texture,
-    transparent: true,
+const getBlurTexture = (inputTexture: Texture): Texture => {
+  blurRenderTargets.forEach(
+    (
+      { material: blurMaterial, scene: blurScene, target: blurRenderTarget },
+      i
+    ) => {
+      const isHorizontal = i === 0
+      const texture = isHorizontal
+        ? inputTexture
+        : blurRenderTargets[0].target.texture
+
+      blurMaterial.uniforms.uIsHorizontal.value = isHorizontal
+      blurMaterial.uniforms.uBlurTexture.value = texture
+
+      renderer.setRenderTarget(blurRenderTarget)
+      renderer.render(blurScene, camera)
+    }
+  )
+
+  return blurRenderTargets[1].target.texture
+}
+
+const update = () => {
+  const time = Date.now() - startTime
+
+  const nextRenderIndex = (currentRenderIndex + 1) % renderLen
+
+  const { target: currentTarget } = renderTargets[currentRenderIndex]
+
+  const {
+    scene: nextScene,
+    target: nextTarget,
+    material: nextMaterial,
+  } = renderTargets[nextRenderIndex]
+
+  const {
+    material: pointMaterial,
+    renderTarget: pointRenderTarget,
+    scene: pointScene,
+  } = point
+
+  nextMaterial.uniforms.uPrevTexture.value = currentTarget.texture
+  nextMaterial.uniforms.uTexture.value = pointRenderTarget.texture
+  nextMaterial.uniforms.uProgress.value = progress
+
+  renderer.setRenderTarget(nextTarget)
+  renderer.render(nextScene, camera)
+
+  const blurTexture = getBlurTexture(nextTarget.texture)
+
+  pointMaterial.uniforms.uTime.value = time
+  renderer.setRenderTarget(pointRenderTarget)
+  renderer.render(pointScene, camera)
+
+  mainMesh.material.uniforms.uZanzoTexture.value = blurTexture
+  mainMesh.material.uniforms.uPointTexture.value = pointRenderTarget.texture
+
+  renderer.setRenderTarget(null)
+  renderer.render(mainScene, camera)
+
+  currentRenderIndex = nextRenderIndex
+
+  stats.update()
+
+  requestAnimationFrame(() => {
+    update()
   })
-)
+}
+
+const setCamera = (
+  width: number = window.innerWidth,
+  height: number = window.innerHeight
+) => {
+  const halfW = width / 2
+  const halfH = height / 2
+
+  camera.left = -halfW
+  camera.right = halfW
+  camera.top = halfH
+  camera.bottom = -halfH
+
+  camera.updateProjectionMatrix()
+}
+
+function setRenderer(
+  width: number = window.innerWidth,
+  height: number = window.innerHeight,
+  devicePixelRatio: number = window.devicePixelRatio
+): void {
+  renderer.setPixelRatio(devicePixelRatio)
+  renderer.setSize(width, height)
+
+  bgRenderer.setSize(width, height)
+}
 
 mainScene.add(mainMesh)
-mainScene.add(pointMesh)
 
 setCamera()
 setRenderer()
@@ -296,114 +411,3 @@ pane
       })
     })
   })
-
-function update(): void {
-  const time = Date.now() - startTime
-  const {
-    material: pointMaterial,
-    renderTarget: pointRenderTarget,
-    scene: pointScene,
-  } = point
-
-  pointMaterial.uniforms.uTime.value = time
-  renderer.setRenderTarget(pointRenderTarget)
-  renderer.render(pointScene, camera)
-
-  const nextRenderIndex = (currentRenderIndex + 1) % renderLen
-
-  const {
-    scene: nextScene,
-    target: nextTarget,
-    material: nextMaterial,
-  } = renderTargets[nextRenderIndex]
-
-  const { target: currentTarget } = renderTargets[currentRenderIndex]
-
-  blurRenderTargets.forEach(
-    (
-      { material: blurMaterial, scene: blurScene, target: blurRenderTarget },
-      i
-    ) => {
-      const isHorizontal = i === 0
-      const texture = isHorizontal
-        ? currentTarget.texture
-        : blurRenderTargets[0].target.texture
-
-      blurMaterial.uniforms.uIsHorizontal.value = isHorizontal
-      blurMaterial.uniforms.uBlurTexture.value = texture
-
-      renderer.setRenderTarget(blurRenderTarget)
-      renderer.render(blurScene, camera)
-    }
-  )
-
-  nextMaterial.uniforms.uPrevTexture.value = blurRenderTargets[1].target.texture
-  nextMaterial.uniforms.uTexture.value = pointRenderTarget.texture
-  nextMaterial.uniforms.uProgress.value = progress
-
-  renderer.setRenderTarget(nextTarget)
-  renderer.render(nextScene, camera)
-
-  mainMesh.material.uniforms.uZanzoTexture.value = nextTarget.texture
-
-  renderer.setRenderTarget(null)
-  renderer.render(mainScene, camera)
-
-  currentRenderIndex = nextRenderIndex
-
-  stats.update()
-
-  requestAnimationFrame(() => {
-    update()
-  })
-}
-
-function setCamera(
-  width: number = window.innerWidth,
-  height: number = window.innerHeight
-): void {
-  const halfW = width / 2
-  const halfH = height / 2
-
-  camera.left = -halfW
-  camera.right = halfW
-  camera.top = halfH
-  camera.bottom = -halfH
-
-  camera.updateProjectionMatrix()
-}
-
-function setRenderer(
-  width: number = window.innerWidth,
-  height: number = window.innerHeight,
-  devicePixelRatio: number = window.devicePixelRatio
-): void {
-  renderer.setPixelRatio(devicePixelRatio)
-  renderer.setSize(width, height)
-
-  bgRenderer.setSize(width, height)
-}
-
-function createGeometry(
-  width: number = window.innerWidth,
-  height: number = window.innerHeight
-): BufferGeometry {
-  const position = []
-
-  for (let i: number = 0; i < 200; i++) {
-    position.push(
-      Math.random() * -width + width * 0.5,
-      Math.random() * -height + height * 0.5,
-      0
-    )
-  }
-
-  const geometry = new BufferGeometry()
-
-  geometry.setAttribute(
-    'position',
-    new BufferAttribute(new Float32Array(position), 3)
-  )
-
-  return geometry
-}

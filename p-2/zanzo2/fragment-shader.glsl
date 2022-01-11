@@ -1,6 +1,7 @@
 varying vec2 vUv;
-uniform sampler2D uTexture;
-uniform sampler2D uPrevTexture;
+uniform sampler2D uZanzo2Texture;
+uniform sampler2D uZanzo2PrevTexture;
+uniform float uTime;
 // uniform float uProgress;
 
 // float rand(vec2 co) {
@@ -12,8 +13,10 @@ uniform sampler2D uPrevTexture;
 // }
 
 void main(void) {
-  vec4 prevColor = texture2D(uPrevTexture, vUv) - 0.007;
-  vec4 color = texture2D(uTexture, vUv);
+  float noise = snoise(vec3(vUv.y, vUv.x, uTime * 0.0001));
+
+  vec4 prevColor = texture2D(uZanzo2PrevTexture, vUv + noise * 0.003) - 0.00199;
+  vec4 color = texture2D(uZanzo2Texture, vUv);
 
   gl_FragColor = max(prevColor, color);
 }

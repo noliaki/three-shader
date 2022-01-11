@@ -13,6 +13,7 @@ module.exports = {
         'zanzo-blur': resolve(__dirname, 'zanzo-blur/index.html'),
         'zanzo-blur-step': resolve(__dirname, 'zanzo-blur-step/index.html'),
         'p-1': resolve(__dirname, 'p-1/index.html'),
+        'p-2': resolve(__dirname, 'p-2/index.html'),
       },
     },
     terserOptions: {
