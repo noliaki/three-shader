@@ -59,6 +59,7 @@ const update = () => {
     nextTexture: colorTexture,
     camera,
     progress,
+    time,
   })
 
   // const blurTexture = getBlurTexture({

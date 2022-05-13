@@ -35,6 +35,9 @@ export const zanzoRenderTargets: {
       uProgress: {
         value: 0,
       },
+      uTime: {
+        value: 0,
+      },
     },
     vertexShader,
     fragmentShader: `
@@ -62,6 +65,7 @@ export const getZanzoTexture = ({
   nextTexture,
   camera,
   progress,
+  time,
 }) => {
   const nextRenderIndex = (currentRenderIndex + 1) % 2
   const { renderTarget: currentTarget } = zanzoRenderTargets[currentRenderIndex]
@@ -75,6 +79,7 @@ export const getZanzoTexture = ({
   nextMaterial.uniforms.uZanzoPrevTexture.value = currentTarget.texture
   nextMaterial.uniforms.uZanzoTexture.value = nextTexture
   nextMaterial.uniforms.uProgress.value = progress
+  nextMaterial.uniforms.uTime.value = time
 
   renderer.setRenderTarget(nextTarget)
   renderer.render(nextScene, camera)

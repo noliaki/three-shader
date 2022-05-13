@@ -11,17 +11,17 @@ vec3 hsvToRgb(float h, float s, float v){
 
 void main(void) {
   vec4 fontColor = texture2D(uFontTexture, vUv);
-  float noise = (snoise(vec3(uTime * 0.0003, vUv * 0.4)) + 1.0) * 0.5;
+  float noise = (snoise(vec3(vUv, uTime * 0.0001)) + 1.0) * 0.5;
   vec3 color = hsvToRgb(
     noise,
-    0.5,
-    0.7
+    0.9,
+    0.9
   );
 
   if (fontColor.a == 0.0) {
     discard;
   } else {
-    gl_FragColor = vec4(0.1, 0.1, 0.1, 0.0);
+    gl_FragColor = vec4(color, 1.0);
   }
   // gl_FragColor = vec4(color, smoothstep(0.0, 1.0, fontColor.a));
 }
