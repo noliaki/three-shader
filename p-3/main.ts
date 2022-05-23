@@ -4,26 +4,14 @@ import { debounce } from '../src/utility'
 
 import {
   scene as displayScene,
-  mesh as displayMesh,
   updateTexture as updateDisplayTexture,
 } from './display'
 import { Pane } from 'tweakpane'
 import Stats from 'three/examples/jsm/libs/stats.module'
 
 import { getFontTexture } from './font'
-
-import {
-  renderTarget as particleRenderTarget,
-  getUpdatedTexture as getUpdatedParticleTexture,
-} from './particle'
-
 import { getZanzoTexture } from './zanzo'
-import { getZanzoTexture as getZanzo2Texture } from './zanzo2'
-import { blurRenderTargets, getBlurTexture } from './blur'
-// import {
-//   updateFontTexture,
-//   getUpdatedTexture as getUpdatedMainTexture,
-// } from './mix'
+import { blurRenderTargets } from './blur'
 import { getTexture as getColorTexture, updateFontTexture } from './color'
 
 const winWidth = window.innerWidth
@@ -51,6 +39,7 @@ const bgRenderer = new WebGLRenderer({
 let progress = 0
 
 const update = () => {
+  progress += 1
   const time = Date.now() - startTime
   const colorTexture = getColorTexture({ time, camera, renderer })
 
@@ -61,33 +50,6 @@ const update = () => {
     progress,
     time,
   })
-
-  // const blurTexture = getBlurTexture({
-  //   texture: zanzoTexture,
-  //   renderer,
-  //   camera,
-  // })
-
-  // const updatedParticleTexture = getUpdatedParticleTexture({
-  //   renderer,
-  //   time,
-  //   camera,
-  // })
-
-  // const updatedMainTexture = getUpdatedMainTexture({
-  //   renderer,
-  //   camera,
-  //   blurTexture,
-  //   particleTexture: updatedParticleTexture,
-  // })
-
-  // const uZanzo2Texture = getZanzo2Texture({
-  //   renderer,
-  //   nextTexture: updatedMainTexture,
-  //   camera,
-  //   progress,
-  //   time,
-  // })
 
   updateDisplayTexture({
     texture: zanzoTexture,
@@ -148,6 +110,7 @@ document.addEventListener(
       return
     }
 
+    progress = 0
     updateFontTexture({ texture: getFontTexture(event.key) })
   },
   {

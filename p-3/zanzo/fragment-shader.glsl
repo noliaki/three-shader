@@ -2,6 +2,7 @@ varying vec2 vUv;
 uniform sampler2D uZanzoTexture;
 uniform sampler2D uZanzoPrevTexture;
 uniform float uTime;
+uniform float uProgress;
 
 float rand(vec2 co) {
   float a = fract(dot(co, vec2(2.067390879775102, 12.451168662908249))) - 0.5;
@@ -12,21 +13,22 @@ float rand(vec2 co) {
 }
 
 void main(void) {
+  float progress = uProgress * 0.01;
   vec4 prevColor = texture2D(
     uZanzoPrevTexture,
     vUv
   );// - 0.00199;
   float r = (rand(vec2(prevColor.r, prevColor.b)) + 1.0) * 0.5;
-  float noiseX = snoise(vec3(vUv.x, vUv.y * r, uTime * 0.00001));
-  float noiseY = snoise(vec3(vUv.y * r, vUv.x, uTime * 0.0001));
+  float noiseX = snoise(vec3(vUv.x * 4.0, vUv.y * r, uTime * 0.00001 * progress));
+  float noiseY = snoise(vec3(vUv.y * r, vUv.x * 10.0, uTime * 0.0001 * progress));
 
   vec4 color = texture2D(uZanzoTexture, vUv + (noiseX * 0.01));
 
   vec4 prevMixColor = texture2D(
     uZanzoPrevTexture,
     vec2(
-      vUv.x + (noiseX * 0.01),
-      vUv.y + (noiseY * 0.009)
+      vUv.x + (noiseX * 0.01 * progress),
+      vUv.y + (noiseY * 0.009 * progress)
     )
   );
 
