@@ -1,0 +1,9 @@
+export const texPixelRatio = 0.4 // ピクセル比
+export const solverIteration = 20 // 圧力計算の回数
+export const attenuation = 1.0 // 圧力のステップごとの減衰値
+export const alpha = 1.0 // 圧力計算時の係数
+export const beta = 1.0 // 圧力計算時の係数
+export const viscosity = 0.99 // 粘度
+export const forceRadius = 90 // 加える力の半径
+export const forceCoefficient = 1 // 加える力の係数
+export const autoforceCoefficient = 0.06 // 自動で加える力の係数

@@ -8,7 +8,6 @@ vec2 sampleVelocity(sampler2D tex, vec2 uv, vec2 resolution){
   if(uv.x < 0.0) {
     cellOffset.x = 1.0;
     multiplier.x = -1.0;
-
   } else if(uv.x > 1.0) {
     cellOffset.x = -1.0;
     multiplier.x = -1.0;
@@ -17,7 +16,6 @@ vec2 sampleVelocity(sampler2D tex, vec2 uv, vec2 resolution){
   if(uv.y < 0.0) {
     cellOffset.y = 1.0;
     multiplier.y = -1.0;
-
   } else if(uv.y > 1.0) {
     cellOffset.y = -1.0;
     multiplier.y = -1.0;
