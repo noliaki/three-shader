@@ -7,3 +7,4 @@ export const viscosity = 0.99 // 粘度
 export const forceRadius = 90 // 加える力の半径
 export const forceCoefficient = 1 // 加える力の係数
 export const autoforceCoefficient = 0.06 // 自動で加える力の係数
+export const devicePixelRatio = 1

@@ -11,12 +11,11 @@ import {
 } from 'three'
 import { texPixelRatio } from './config'
 
-export const mesh = new Mesh(new PlaneBufferGeometry(100, 100))
-
 let currentIndex = 0
-const texW = 100
-const texH = 100
+const texW = window.innerWidth
+const texH = window.innerHeight
 
+export const mesh = new Mesh(new PlaneBufferGeometry(texW, texH))
 export const scene = new Scene()
 const renderTarget = new WebGLRenderTarget(texW, texH, {
   magFilter: NearestFilter,
@@ -34,13 +33,11 @@ const renderTargets = [renderTarget, renderTarget.clone()]
 export const getRendertarget = () => renderTargets[currentIndex]
 export const getRenderTexture = () => getRendertarget().texture
 export const swap = () => (currentIndex = (currentIndex + 1) % 2)
-export const setMaterial = (material: RawShaderMaterial): Mesh => {
+export const setMaterial = (material: RawShaderMaterial): void => {
   mesh.material = material
   mesh.material.needsUpdate = true
-
-  return mesh
 }
-export const update = ({ renderer, camera }) => {
+export const render = ({ renderer, camera }) => {
   renderer.setRenderTarget(getRendertarget())
   renderer.render(scene, camera)
   renderer.setRenderTarget(null)
