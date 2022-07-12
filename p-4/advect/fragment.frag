@@ -1,5 +1,3 @@
-precision highp float;
-
 uniform float texPixelRatio;
 uniform float attenuation;
 uniform vec2 resolution;

@@ -1,5 +1,3 @@
-precision highp float;
-
 uniform float time;
 uniform float devicePixelRatio;
 uniform vec2 resolution;
@@ -28,7 +26,7 @@ void main(){
   float vLength = length(velocity);
 
   gl_FragColor = vec4(
-    hsv2rgb(
+    hsvToRgb(
       map(vLength * 0.3, 0.0, 1.0, h1, h2, true) + time * 0.00006,
       map(pressure * 0.3, 0.0, 1.0, s1, s2, true),
       map(1.0 - vLength * pressure * 0.1, 0.0, 1.0, v1, v2, true)

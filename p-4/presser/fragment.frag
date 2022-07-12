@@ -1,4 +1,3 @@
-precision highp float;
 
 uniform float texPixelRatio;
 uniform float alpha;

@@ -1,5 +1,3 @@
-precision highp float;
-
 uniform float time;
 uniform float texPixelRatio;
 uniform float viscosity;
@@ -13,8 +11,8 @@ uniform vec2 beforePointerPos;
 
 void main(){
   vec2 r = resolution * texPixelRatio;
-  vec2 coord = gl_FragCoord.xy;
-  vec2 uv = coord / r;
+  vec2 fc = gl_FragCoord.xy;
+  vec2 uv = fc / r;
   vec4 data = texture2D(dataTex, uv);
   vec2 v = data.xy;
 
@@ -22,10 +20,10 @@ void main(){
   vec2 offsetY = vec2(0.0, 1.0);
 
   // 上下左右の圧力
-  float pLeft   = samplePressure(dataTex, (coord - offsetX) / r, r);
-  float pRight  = samplePressure(dataTex, (coord + offsetX) / r, r);
-  float pTop    = samplePressure(dataTex, (coord - offsetY) / r, r);
-  float pBottom = samplePressure(dataTex, (coord + offsetY) / r, r);
+  float pLeft   = samplePressure(dataTex, (fc - offsetX) / r, r);
+  float pRight  = samplePressure(dataTex, (fc + offsetX) / r, r);
+  float pTop    = samplePressure(dataTex, (fc - offsetY) / r, r);
+  float pBottom = samplePressure(dataTex, (fc + offsetY) / r, r);
 
   // マウス
   vec2 mPos = vec2(pointerPos.x * texPixelRatio, r.y - pointerPos.y * texPixelRatio);
@@ -36,23 +34,22 @@ void main(){
   vec2 mforce = d * normalize(mPos - uv * r + mouseV);
 
   // 自動
-  // float noiseX = snoise2(vec2(uv.s, time / 5000.0 + uv.t));
-  // float noiseY = snoise2(vec2(time / 5000.0 + uv.s, uv.t));
-  // float waveX = cos(time / 1000.0 + noiseX) * sin(time / 400.0 + noiseX) * cos(time / 600.0 + noiseX);
-  // float waveY = sin(time / 500.0 + noiseY) * cos(time / 800.0 + noiseY) * sin(time / 400.0 + noiseY);
-  // waveX = map(waveX, -1.0, 1.0, -0.2, 1.2, true);
-  // waveY = map(waveY, -1.0, 1.0, -0.2, 1.2, true);
-  // vec2 aPos = vec2(
-  //   r.x * waveX,
-  //   r.y * waveY
-  // );
-  // len = length(aPos - uv * r) / forceRadius / texPixelRatio / 10.0;
-  // d = clamp(1.0 - len, 0.0, 1.0) * autoforceCoefficient;
-  // vec2 aforce = d * normalize(aPos - uv * r);
+  float noiseX = snoise(vec3(uv.s, time / 5000.0 + uv.t, 0.1));
+  float noiseY = snoise(vec3(time / 5000.0 + uv.s, uv.t, 0.1));
+  float waveX = cos(time / 1000.0 + noiseX) * sin(time / 400.0 + noiseX) * cos(time / 600.0 + noiseX);
+  float waveY = sin(time / 500.0 + noiseY) * cos(time / 800.0 + noiseY) * sin(time / 400.0 + noiseY);
+  waveX = map(waveX, -1.0, 1.0, -0.2, 1.2, true);
+  waveY = map(waveY, -1.0, 1.0, -0.2, 1.2, true);
+  vec2 aPos = vec2(
+    r.x * waveX,
+    r.y * waveY
+  );
+  len = length(aPos - uv * r) / forceRadius / texPixelRatio / 10.0;
+  d = clamp(1.0 - len, 0.0, 1.0) * autoforceCoefficient;
+  vec2 aforce = d * normalize(aPos - uv * r);
 
   v += vec2(pRight - pLeft, pBottom - pTop) * 0.5;
-  v += mforce;
-  // v += mforce + aforce;
+  v += mforce + aforce;
   v *= viscosity;
   gl_FragColor = vec4(v, data.zw);
 }

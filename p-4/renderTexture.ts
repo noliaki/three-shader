@@ -7,13 +7,11 @@ import {
   ClampToEdgeWrapping,
   RGBAFormat,
   FloatType,
-  WebGLRenderer,
-  OrthographicCamera,
+  RawShaderMaterial,
 } from 'three'
+import { texPixelRatio } from './config'
 
-export const mesh = new Mesh(
-  new PlaneBufferGeometry(window.innerWidth, window.innerHeight, 1, 1)
-)
+export const mesh = new Mesh(new PlaneBufferGeometry(100, 100))
 
 let currentIndex = 0
 const texW = 100
@@ -34,6 +32,31 @@ const renderTarget = new WebGLRenderTarget(texW, texH, {
 const renderTargets = [renderTarget, renderTarget.clone()]
 
 export const getRendertarget = () => renderTargets[currentIndex]
+export const getRenderTexture = () => getRendertarget().texture
 export const swap = () => (currentIndex = (currentIndex + 1) % 2)
+export const setMaterial = (material: RawShaderMaterial): Mesh => {
+  mesh.material = material
+  mesh.material.needsUpdate = true
+
+  return mesh
+}
+export const update = ({ renderer, camera }) => {
+  renderer.setRenderTarget(getRendertarget())
+  renderer.render(scene, camera)
+  renderer.setRenderTarget(null)
+}
+
+export const resize = ({
+  width = window.innerWidth * texPixelRatio,
+  height = window.innerHeight * texPixelRatio,
+} = {}) => {
+  renderTargets.forEach((renderTarget) => {
+    renderTarget.setSize(width, height)
+  })
+}
+
+renderTargets.forEach((renderTarget) => {
+  renderTarget.texture.flipY = false
+})
 
 scene.add(mesh)
