@@ -13,7 +13,7 @@ import { debounce } from '../src/utility'
 
 import vertexShader from './common.vert?raw'
 import { fragmentShader } from './fragment'
-import { texPixelRatio, devicePixelRatio } from './config'
+import { texPixelRatio, devicePixelRatio, solverIteration } from './config'
 import {
   getRenderTexture,
   swap as swapRenderTeture,
@@ -21,7 +21,6 @@ import {
   render as renderRenderTexture,
   resize as resizeRenderTexture,
 } from './renderTexture'
-import { solverIteration } from './config'
 import { material as divergenceMaterial } from './divergence'
 import { material as presserMaterial } from './presser'
 import { material as velocityMaterial } from './velocity'
@@ -97,6 +96,7 @@ const camera = new OrthographicCamera(
   100
 )
 camera.position.z = 10
+camera.lookAt(0, 0, 0)
 const renderer = new WebGLRenderer({
   alpha: true,
 })
@@ -107,7 +107,6 @@ const update = () => {
   // -----------------------
   // divergence
   divergenceMaterial.uniforms.dataTex.value = getRenderTexture()
-  divergenceMaterial.needsUpdate = true
   setMaterial(divergenceMaterial)
   swapRenderTeture()
   renderRenderTexture({ renderer, camera })
@@ -116,7 +115,6 @@ const update = () => {
   // presser
   for (let i = 0; i < solverIteration; i++) {
     presserMaterial.uniforms.dataTex.value = getRenderTexture()
-    presserMaterial.needsUpdate = true
     setMaterial(presserMaterial)
     swapRenderTeture()
     renderRenderTexture({ renderer, camera })
@@ -133,7 +131,6 @@ const update = () => {
     prevMousePoint.x,
     prevMousePoint.y
   )
-  velocityMaterial.needsUpdate = true
   setMaterial(velocityMaterial)
   swapRenderTeture()
   renderRenderTexture({ renderer, camera })
@@ -141,7 +138,6 @@ const update = () => {
   // -----------------------
   // advect
   advectMaterial.uniforms.dataTex.value = getRenderTexture()
-  advectMaterial.needsUpdate = true
   setMaterial(advectMaterial)
   swapRenderTeture()
   renderRenderTexture({ renderer, camera })
@@ -153,8 +149,8 @@ const update = () => {
   material.uniforms.time.value = time
   material.needsUpdate = true
 
-  textureMesh.material.uniforms.dataTex.value = getRenderTexture()
-  textureMesh.material.needsUpdate = true
+  // textureMesh.material.uniforms.dataTex.value = getRenderTexture()
+  // textureMesh.material.needsUpdate = true
 
   renderer.setRenderTarget(null)
   renderer.render(scene, camera)
@@ -162,7 +158,6 @@ const update = () => {
   prevMousePoint.x = mousePoint.x
   prevMousePoint.y = mousePoint.y
 
-  swapRenderTeture()
   stats.update()
 
   requestAnimationFrame(update)
@@ -206,6 +201,7 @@ window.addEventListener(
   'resize',
   debounce((_event: Event): void => {
     const r = new Vector2(window.innerWidth, window.innerHeight)
+
     divergenceMaterial.uniforms.resolution.value = r
     presserMaterial.uniforms.resolution.value = r
     velocityMaterial.uniforms.resolution.value = r
@@ -219,8 +215,9 @@ window.addEventListener(
   })
 )
 
+renderer.setPixelRatio(devicePixelRatio)
 scene.add(mesh)
-scene.add(textureMesh)
+// scene.add(textureMesh)
 document.body.appendChild(stats.domElement)
 document.body.appendChild(renderer.domElement)
 

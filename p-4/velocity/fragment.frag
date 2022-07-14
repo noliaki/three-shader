@@ -34,8 +34,8 @@ void main(){
   vec2 mforce = d * normalize(mPos - uv * r + mouseV);
 
   // 自動
-  float noiseX = snoise(vec3(uv.s, time / 5000.0 + uv.t, 0.0001));
-  float noiseY = snoise(vec3(time / 5000.0 + uv.s, uv.t, 0.00001));
+  float noiseX = snoise(vec2(uv.s, time / 5000.0 + uv.t));
+  float noiseY = snoise(vec2(time / 5000.0 + uv.s, uv.t));
   float waveX = cos(time / 1000.0 + noiseX) * sin(time / 400.0 + noiseX) * cos(time / 600.0 + noiseX);
   float waveY = sin(time / 500.0 + noiseY) * cos(time / 800.0 + noiseY) * sin(time / 400.0 + noiseY);
   waveX = map(waveX, -1.0, 1.0, -0.2, 1.2, true);
