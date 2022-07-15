@@ -17,5 +17,5 @@ void main(){
   vec2 vBottom = sampleVelocity(dataTex, (fc + offsetY) / r, r);
 
   float divergence = ((vRight.x - vLeft.x) + (vBottom.y - vTop.y)) * 0.5;
-  gl_FragColor = vec4(data.xy, data.z, divergence);
+  gl_FragColor = vec4(data.xyz, divergence);
 }

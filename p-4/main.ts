@@ -99,6 +99,7 @@ camera.position.z = 10
 camera.lookAt(0, 0, 0)
 const renderer = new WebGLRenderer({
   alpha: true,
+  preserveDrawingBuffer: true,
 })
 
 const update = () => {
@@ -187,6 +188,29 @@ const setCamera = (
   camera.updateProjectionMatrix()
 }
 
+const onWinResize = (_event?: Event): void => {
+  const r = new Vector2(window.innerWidth, window.innerHeight)
+
+  divergenceMaterial.uniforms.resolution.value = r
+  divergenceMaterial.uniformsNeedUpdate = true
+
+  presserMaterial.uniforms.resolution.value = r
+  presserMaterial.uniformsNeedUpdate = true
+
+  velocityMaterial.uniforms.resolution.value = r
+  velocityMaterial.uniformsNeedUpdate = true
+
+  advectMaterial.uniforms.resolution.value = r
+  advectMaterial.uniformsNeedUpdate = true
+
+  mesh.material.uniforms.resolution.value = r
+  mesh.material.uniformsNeedUpdate = true
+
+  setCamera()
+  setRenderer()
+  resizeRenderTexture()
+}
+
 window.addEventListener(
   'mousemove',
   (event: MouseEvent): void => {
@@ -198,23 +222,7 @@ window.addEventListener(
   }
 )
 
-window.addEventListener(
-  'resize',
-  debounce((_event: Event): void => {
-    const r = new Vector2(window.innerWidth, window.innerHeight)
-
-    divergenceMaterial.uniforms.resolution.value = r
-    presserMaterial.uniforms.resolution.value = r
-    velocityMaterial.uniforms.resolution.value = r
-    advectMaterial.uniforms.resolution.value = r
-
-    mesh.material.uniforms.resolution.value = r
-
-    setCamera()
-    setRenderer()
-    resizeRenderTexture()
-  })
-)
+window.addEventListener('resize', debounce(onWinResize))
 
 renderer.setPixelRatio(devicePixelRatio)
 scene.add(mesh)
@@ -222,7 +230,7 @@ scene.add(mesh)
 document.body.appendChild(stats.domElement)
 document.body.appendChild(renderer.domElement)
 
-window.dispatchEvent(new Event('resize'))
+onWinResize()
 
 renderRenderTexture({ renderer, camera })
 swapRenderTeture()

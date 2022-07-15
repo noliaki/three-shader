@@ -34,18 +34,23 @@ void main(){
 console.log(mesh.geometry)
 
 export const scene = new Scene()
-const renderTarget = new WebGLRenderTarget(texW, texH, {
-  magFilter: NearestFilter,
-  minFilter: NearestFilter,
-  wrapS: ClampToEdgeWrapping,
-  wrapT: ClampToEdgeWrapping,
-  format: RGBAFormat,
-  type: FloatType,
-  depthBuffer: false,
-  stencilBuffer: false,
-  generateMipmaps: false,
+const renderTargets = [...new Array(2)].map((_) => {
+  const rt = new WebGLRenderTarget(texW, texH, {
+    magFilter: NearestFilter,
+    minFilter: NearestFilter,
+    wrapS: ClampToEdgeWrapping,
+    wrapT: ClampToEdgeWrapping,
+    format: RGBAFormat,
+    type: FloatType,
+    depthBuffer: false,
+    stencilBuffer: false,
+    generateMipmaps: false,
+  })
+
+  rt.texture.flipY = false
+
+  return rt
 })
-const renderTargets = [renderTarget, renderTarget.clone()]
 
 export const getRendertarget = () => renderTargets[currentIndex]
 export const getRenderTexture = () => getRendertarget().texture
@@ -69,9 +74,5 @@ export const resize = ({
     renderTarget.setSize(width, height)
   })
 }
-
-renderTargets.forEach((renderTarget) => {
-  renderTarget.texture.flipY = false
-})
 
 scene.add(mesh)
