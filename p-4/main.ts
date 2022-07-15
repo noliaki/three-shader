@@ -147,6 +147,7 @@ const update = () => {
   const { material } = mesh
   material.uniforms.dataTex.value = getRenderTexture()
   material.uniforms.time.value = time
+  material.uniformsNeedUpdate = true
   material.needsUpdate = true
 
   // textureMesh.material.uniforms.dataTex.value = getRenderTexture()
@@ -222,5 +223,9 @@ document.body.appendChild(stats.domElement)
 document.body.appendChild(renderer.domElement)
 
 window.dispatchEvent(new Event('resize'))
+
+renderRenderTexture({ renderer, camera })
+swapRenderTeture()
+renderRenderTexture({ renderer, camera })
 
 update()

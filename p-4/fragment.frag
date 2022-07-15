@@ -31,6 +31,9 @@ void main(){
 
   float vLength = length(velocity);
 
+  // velocity = velocity * 0.5 + 0.5;
+  // vec3 color = vec3(velocity * velocity, 1.0);
+
   gl_FragColor = vec4(
     hsv2rgb(vec3(
       map(vLength * 0.3, 0.0, 1.0, h1, h2, true) + time * 0.00006,

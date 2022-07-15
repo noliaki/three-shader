@@ -6,19 +6,15 @@ float samplePressure(sampler2D tex, vec2 uv, vec2 resolution){
   //walls
   if(uv.x < 0.0) {
     cellOffset.x = 1.0;
-
   } else if(uv.x > 1.0) {
     cellOffset.x = -1.0;
-
   }
 
   if(uv.y < 0.0) {
     cellOffset.y = 1.0;
-
   } else if(uv.y > 1.0) {
     cellOffset.y = -1.0;
-
   }
 
-  return texture2D(tex, uv + cellOffset / resolution).z;
+  return texture2D(tex, uv + (cellOffset / resolution)).z;
 }
