@@ -27,6 +27,6 @@ void main() {
   gl_FragColor = vec4(
     bilerp(dataTex, p, r) * attenuation,
     samplePressure(dataTex, fc / r, r),
-    1.0
+    0.0
   );
 }

@@ -1,5 +1,5 @@
 export const texPixelRatio = 0.4 // ピクセル比
-export const solverIteration = 20 // 圧力計算の回数
+export const solverIteration = 10 // 圧力計算の回数
 export const attenuation = 1.0 // 圧力のステップごとの減衰値
 export const alpha = 1.0 // 圧力計算時の係数
 export const beta = 1.0 // 圧力計算時の係数

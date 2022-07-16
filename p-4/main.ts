@@ -42,33 +42,6 @@ const start = Date.now()
 const winWidth = window.innerWidth
 const winHeight = window.innerHeight
 
-const textureMesh = new Mesh(
-  new PlaneBufferGeometry(100, 100, 1, 1),
-  new RawShaderMaterial({
-    vertexShader,
-    fragmentShader: `
-precision highp float;
-
-uniform sampler2D dataTex;
-uniform vec2 resolution;
-
-void main(){
-  vec2 uv = gl_FragCoord.xy / resolution.xy;
-
-  gl_FragColor = texture2D(dataTex, uv);
-}
-    `,
-    uniforms: {
-      dataTex: {
-        value: new Texture(),
-      },
-      resolution: {
-        value: new Vector2(winWidth, winHeight),
-      },
-    },
-  })
-)
-
 const mesh = new Mesh(
   new PlaneBufferGeometry(winWidth, winHeight, 1, 1),
   new RawShaderMaterial({
@@ -132,6 +105,7 @@ const update = () => {
     prevMousePoint.x,
     prevMousePoint.y
   )
+  velocityMaterial.uniforms.dataTex.value = getRenderTexture()
   setMaterial(velocityMaterial)
   swapRenderTeture()
   renderRenderTexture({ renderer, camera })
@@ -148,11 +122,6 @@ const update = () => {
   const { material } = mesh
   material.uniforms.dataTex.value = getRenderTexture()
   material.uniforms.time.value = time
-  material.uniformsNeedUpdate = true
-  material.needsUpdate = true
-
-  // textureMesh.material.uniforms.dataTex.value = getRenderTexture()
-  // textureMesh.material.needsUpdate = true
 
   renderer.setRenderTarget(null)
   renderer.render(scene, camera)
@@ -192,19 +161,10 @@ const onWinResize = (_event?: Event): void => {
   const r = new Vector2(window.innerWidth, window.innerHeight)
 
   divergenceMaterial.uniforms.resolution.value = r
-  divergenceMaterial.uniformsNeedUpdate = true
-
   presserMaterial.uniforms.resolution.value = r
-  presserMaterial.uniformsNeedUpdate = true
-
   velocityMaterial.uniforms.resolution.value = r
-  velocityMaterial.uniformsNeedUpdate = true
-
   advectMaterial.uniforms.resolution.value = r
-  advectMaterial.uniformsNeedUpdate = true
-
   mesh.material.uniforms.resolution.value = r
-  mesh.material.uniformsNeedUpdate = true
 
   setCamera()
   setRenderer()
@@ -226,7 +186,6 @@ window.addEventListener('resize', debounce(onWinResize))
 
 renderer.setPixelRatio(devicePixelRatio)
 scene.add(mesh)
-// scene.add(textureMesh)
 document.body.appendChild(stats.domElement)
 document.body.appendChild(renderer.domElement)
 

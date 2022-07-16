@@ -28,12 +28,28 @@ void main(){
   vec4 data = texture2D(dataTex, uv);
   vec2 velocity = data.xy;
   float pressure = data.z;
-
   float vLength = length(velocity);
 
-  // velocity = velocity * 0.5 + 0.5;
-  // vec3 color = vec3(velocity * velocity, 1.0);
+  vec2 v = (velocity + 1.0) * 0.5;
+  vec3 color = mix(vec3(1.0), vec3(v, 1.0), vLength);
 
+  // gl_FragColor = vec4(
+  //   vLength,
+  //   0.0,
+  //   0.0,
+  //   1.0
+  // );
+
+  // float y = map(vLength * 0.3, 0.0, 1.0, h1, h2, true) + (sin(time * 0.00002) + 1.0) * 0.5;
+  // float i = map(pressure * 0.3, 0.0, 1.0, s1, s2, true) + (sin(time * 0.00004) + 1.0) * 0.5;
+  // float q = map(1.0 - vLength * pressure * 0.1, 0.0, 1.0, v1, v2, true) + (sin(time * 0.00006) + 1.0) * 0.5;
+
+  // gl_FragColor = vec4(
+  //   y + 0.956 * i + 0.621 * q,
+  //   y - 0.272 * i - 0.647 * q,
+  //   y - 1.105 * i + 0.702 * q,
+  //   1.0
+  // );
   gl_FragColor = vec4(
     hsv2rgb(vec3(
       map(vLength * 0.3, 0.0, 1.0, h1, h2, true) + time * 0.00006,

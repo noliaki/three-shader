@@ -57,8 +57,6 @@ export const getRenderTexture = () => getRendertarget().texture
 export const swap = () => (currentIndex = (currentIndex + 1) % 2)
 export const setMaterial = (material: RawShaderMaterial): void => {
   mesh.material = material
-  mesh.material.needsUpdate = true
-  mesh.material.uniformsNeedUpdate = true
 }
 export const render = ({ renderer, camera }) => {
   renderer.setRenderTarget(getRendertarget())

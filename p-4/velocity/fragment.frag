@@ -29,9 +29,10 @@ void main(){
   vec2 mPos = vec2(pointerPos.x * texPixelRatio, r.y - pointerPos.y * texPixelRatio);
   vec2 mPPos = vec2(beforePointerPos.x * texPixelRatio, r.y - beforePointerPos.y * texPixelRatio);
   vec2 mouseV = mPos - mPPos;
-  float len = length(mPos - uv * r) / forceRadius / texPixelRatio;
+  vec2 diff = mPos - fc;
+  float len = length(diff) / (forceRadius) / texPixelRatio;
   float d = clamp(1.0 - len, 0.0, 1.0) * length(mouseV) * forceCoefficient;
-  vec2 mforce = d * normalize(mPos - uv * r + mouseV);
+  vec2 mforce = d * normalize(diff + mouseV);
 
   // 自動
   float noiseX = snoise(vec2(uv.s, time / 5000.0 + uv.t));
@@ -49,7 +50,9 @@ void main(){
   vec2 aforce = d * normalize(aPos - uv * r);
 
   v += vec2(pRight - pLeft, pBottom - pTop) * 0.5;
-  v += mforce + aforce;
+  // v += mforce + aforce;
+  v += mforce;
   v *= viscosity;
+
   gl_FragColor = vec4(v, data.zw);
 }
