@@ -20,9 +20,9 @@ void main(){
   vec2 offsetY = vec2(0.0, 1.0);
 
   // 上下左右の圧力
-  float pLeft   = samplePressure(dataTex, (fc - offsetX) / r, r);
-  float pRight  = samplePressure(dataTex, (fc + offsetX) / r, r);
-  float pTop    = samplePressure(dataTex, (fc - offsetY) / r, r);
+  float pLeft = samplePressure(dataTex, (fc - offsetX) / r, r);
+  float pRight = samplePressure(dataTex, (fc + offsetX) / r, r);
+  float pTop = samplePressure(dataTex, (fc - offsetY) / r, r);
   float pBottom = samplePressure(dataTex, (fc + offsetY) / r, r);
 
   // マウス
@@ -30,24 +30,27 @@ void main(){
   vec2 mPPos = vec2(beforePointerPos.x * texPixelRatio, r.y - beforePointerPos.y * texPixelRatio);
   vec2 mouseV = mPos - mPPos;
   vec2 diff = mPos - fc;
-  float len = length(diff) / (forceRadius) / texPixelRatio;
-  float d = clamp(1.0 - len, 0.0, 1.0) * length(mouseV) * forceCoefficient;
+  float len =
+    length(diff) /
+    (forceRadius + snoise(vec3(uv, time * 0.00003)) * forceRadius * 0.8) /
+    texPixelRatio;
+  float d = smoothstep(0.0, 1.0, 1.0 - len) * length(mouseV) * forceCoefficient;
   vec2 mforce = d * normalize(diff + mouseV);
 
   // 自動
-  float noiseX = snoise(vec2(uv.s, time / 5000.0 + uv.t));
-  float noiseY = snoise(vec2(time / 5000.0 + uv.s, uv.t));
-  float waveX = cos(time / 1000.0 + noiseX) * sin(time / 400.0 + noiseX) * cos(time / 600.0 + noiseX);
-  float waveY = sin(time / 500.0 + noiseY) * cos(time / 800.0 + noiseY) * sin(time / 400.0 + noiseY);
-  waveX = map(waveX, -1.0, 1.0, -0.2, 1.2, true);
-  waveY = map(waveY, -1.0, 1.0, -0.2, 1.2, true);
-  vec2 aPos = vec2(
-    r.x * waveX,
-    r.y * waveY
-  );
-  len = length(aPos - uv * r) / forceRadius / texPixelRatio / 5.0;
-  d = clamp(1.0 - len, 0.0, 1.0) * autoforceCoefficient;
-  vec2 aforce = d * normalize(aPos - uv * r);
+  // float noiseX = snoise(vec2(uv.s, time / 5000.0 + uv.t));
+  // float noiseY = snoise(vec2(time / 5000.0 + uv.s, uv.t));
+  // float waveX = cos(time / 1000.0 + noiseX) * sin(time / 400.0 + noiseX) * cos(time / 600.0 + noiseX);
+  // float waveY = sin(time / 500.0 + noiseY) * cos(time / 800.0 + noiseY) * sin(time / 400.0 + noiseY);
+  // waveX = map(waveX, -1.0, 1.0, -0.2, 1.2, true);
+  // waveY = map(waveY, -1.0, 1.0, -0.2, 1.2, true);
+  // vec2 aPos = vec2(
+  //   r.x * waveX,
+  //   r.y * waveY
+  // );
+  // len = length(aPos - uv * r) / forceRadius / texPixelRatio / 5.0;
+  // d = clamp(1.0 - len, 0.0, 1.0) * autoforceCoefficient;
+  // vec2 aforce = d * normalize(aPos - uv * r);
 
   v += vec2(pRight - pLeft, pBottom - pTop) * 0.5;
   // v += mforce + aforce;

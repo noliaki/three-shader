@@ -67,7 +67,7 @@ export const resize = ({
   width = Math.round(window.innerWidth * texPixelRatio),
   height = Math.round(window.innerHeight * texPixelRatio),
 } = {}) => {
-  mesh.geometry = new PlaneBufferGeometry(width, height, 1, 1)
+  // mesh.geometry = new PlaneBufferGeometry(width, height, 1, 1)
   renderTargets.forEach((renderTarget) => {
     renderTarget.setSize(width, height)
   })

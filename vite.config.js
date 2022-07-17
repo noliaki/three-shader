@@ -15,6 +15,7 @@ module.exports = {
         'p-1': resolve(__dirname, 'p-1/index.html'),
         'p-2': resolve(__dirname, 'p-2/index.html'),
         'p-3': resolve(__dirname, 'p-3/index.html'),
+        'p-4': resolve(__dirname, 'p-4/index.html'),
       },
     },
     terserOptions: {
