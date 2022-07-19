@@ -32,7 +32,8 @@ void main(){
   vec2 diff = mPos - fc;
   float len =
     length(diff) /
-    (forceRadius + snoise(vec3(uv, time * 0.00003)) * forceRadius * 0.8) /
+    // (forceRadius + snoise(vec3(uv, time * 0.00003)) * forceRadius * 0.8) /
+    (forceRadius) /
     texPixelRatio;
   float d = smoothstep(0.0, 1.0, 1.0 - len) * length(mouseV) * forceCoefficient;
   vec2 mforce = d * normalize(diff + mouseV);

@@ -60,21 +60,20 @@ void main(){
   float pressure = data.z;
   float vLength = length(velocity);
 
-  vec2 vr = velocity;
+  vec2 vr = velocity / texR;
 
   // vec2 v = (velocity + 1.0) * 0.5;
   // vec3 color = mix(vec3(1.0), vec3(v, 1.0), vLength);
+  float hue = (sin(time * 0.00004) + 1.0) * 0.5;
+
   vec3 color = hsvToRgb(
-    smoothstep(-0.8, 0.8, sin(time * 0.00006 + pressure * 0.1)),
-    0.7 + pressure * 0.3,
-    0.7
+    hue + sin((vr.x * vr.x + vr.y * vr.y) + pressure * 0.05),
+    1.0 + pressure * 0.05,
+    1.0 + (pressure * 0.05) + length(vLength)
   );
 
   gl_FragColor = vec4(
-    yiqHueShift(
-      color,
-      smoothstep(-0.8, 0.8, (vr.x + vr.y) * 0.5 + sin(time * 0.00002))
-    ),
+    yiqHueShift(color, (snoise(vec3(vr, time * 0.00006)) + 1.0) * 0.5),
     1.0
   );
 
