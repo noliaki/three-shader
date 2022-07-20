@@ -21,9 +21,21 @@ import {
   render as renderRenderTexture,
   resize as resizeRenderTexture,
 } from './renderTexture'
-import { material as divergenceMaterial } from './divergence'
-import { material as presserMaterial } from './presser'
-import { material as velocityMaterial } from './velocity'
+import {
+  material as divergenceMaterial,
+  resize as resizeDivergence,
+  updateTexture as updateDivergenceTexture,
+} from './divergence'
+import {
+  material as presserMaterial,
+  resize as resizePresser,
+  updateTexture as updatePresserTexture,
+} from './presser'
+import {
+  material as velocityMaterial,
+  update as updateVelocity,
+  resize as resizeVelocity,
+} from './velocity'
 import { material as advectMaterial } from './advect'
 import Stats from 'three/examples/jsm/libs/stats.module'
 
@@ -80,7 +92,9 @@ const update = () => {
 
   // -----------------------
   // divergence
-  divergenceMaterial.uniforms.dataTex.value = getRenderTexture()
+  updateDivergenceTexture({
+    texture: getRenderTexture(),
+  })
   setMaterial(divergenceMaterial)
   swapRenderTeture()
   renderRenderTexture({ renderer, camera })
@@ -88,7 +102,9 @@ const update = () => {
   // -----------------------
   // presser
   for (let i = 0; i < solverIteration; i++) {
-    presserMaterial.uniforms.dataTex.value = getRenderTexture()
+    updatePresserTexture({
+      texture: getRenderTexture(),
+    })
     setMaterial(presserMaterial)
     swapRenderTeture()
     renderRenderTexture({ renderer, camera })
@@ -96,16 +112,28 @@ const update = () => {
 
   // -----------------------
   // velocity
-  velocityMaterial.uniforms.time.value = time
-  velocityMaterial.uniforms.pointerPos.value = new Vector2(
-    mousePoint.x,
-    mousePoint.y
-  )
-  velocityMaterial.uniforms.beforePointerPos.value = new Vector2(
-    prevMousePoint.x,
-    prevMousePoint.y
-  )
-  velocityMaterial.uniforms.dataTex.value = getRenderTexture()
+  updateVelocity({
+    time,
+    pointerPos: new Vector2(
+      mousePoint.x * texPixelRatio,
+      mousePoint.y * texPixelRatio
+    ),
+    beforePointerPos: new Vector2(
+      prevMousePoint.x * texPixelRatio,
+      prevMousePoint.y * texPixelRatio
+    ),
+    dataTex: getRenderTexture(),
+  })
+  // velocityMaterial.uniforms.time.value = time
+  // velocityMaterial.uniforms.pointerPos.value = new Vector2(
+  //   mousePoint.x,
+  //   mousePoint.y
+  // )
+  // velocityMaterial.uniforms.beforePointerPos.value = new Vector2(
+  //   prevMousePoint.x,
+  //   prevMousePoint.y
+  // )
+  // velocityMaterial.uniforms.dataTex.value = getRenderTexture()
   setMaterial(velocityMaterial)
   swapRenderTeture()
   renderRenderTexture({ renderer, camera })
@@ -159,10 +187,21 @@ const setCamera = (
 
 const onWinResize = (_event?: Event): void => {
   const r = new Vector2(window.innerWidth, window.innerHeight)
+  const tr = new Vector2(
+    window.innerWidth * texPixelRatio,
+    window.innerHeight * texPixelRatio
+  )
 
-  divergenceMaterial.uniforms.resolution.value = r
-  presserMaterial.uniforms.resolution.value = r
-  velocityMaterial.uniforms.resolution.value = r
+  resizeDivergence({
+    texResolution: tr,
+  })
+  resizePresser({
+    texResolution: tr,
+  })
+  resizeVelocity({
+    texResolution: tr,
+  })
+  // velocityMaterial.uniforms.resolution.value = r
   advectMaterial.uniforms.resolution.value = r
   mesh.material.uniforms.resolution.value = r
 

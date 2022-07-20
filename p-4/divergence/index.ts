@@ -9,14 +9,22 @@ export const material = new RawShaderMaterial({
   vertexShader,
   fragmentShader,
   uniforms: {
-    texPixelRatio: {
-      value: texPixelRatio,
-    },
-    resolution: {
-      value: new Vector2(window.innerWidth, window.innerHeight),
-    },
     dataTex: {
       value: new Texture(),
     },
+    texResolution: {
+      value: new Vector2(
+        window.innerWidth * texPixelRatio,
+        window.innerHeight * texPixelRatio
+      ),
+    },
   },
 })
+
+export const updateTexture = ({ texture }) => {
+  material.uniforms.dataTex.value = texture
+}
+
+export const resize = ({ texResolution }) => {
+  material.uniforms.texResolution.value = texResolution
+}

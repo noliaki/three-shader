@@ -16,18 +16,39 @@ export const material = new RawShaderMaterial({
   fragmentShader,
   uniforms: {
     time: { value: 0 },
-    texPixelRatio: { value: texPixelRatio },
     viscosity: { value: viscosity },
-    forceRadius: { value: forceRadius },
+    forceRadius: { value: forceRadius * texPixelRatio },
     forceCoefficient: { value: forceCoefficient },
     autoforceCoefficient: { value: autoforceCoefficient },
-    resolution: { value: new Vector2(window.innerWidth, window.innerHeight) },
     dataTex: { value: new Texture() },
     pointerPos: {
-      value: new Vector2(window.innerWidth / 2, window.innerHeight / 2),
+      value: new Vector2(
+        (window.innerWidth / 2) * texPixelRatio,
+        (window.innerHeight / 2) * texPixelRatio
+      ),
     },
     beforePointerPos: {
-      value: new Vector2(window.innerWidth / 2, window.innerHeight / 2),
+      value: new Vector2(
+        (window.innerWidth / 2) * texPixelRatio,
+        (window.innerHeight / 2) * texPixelRatio
+      ),
+    },
+    texResolution: {
+      value: new Vector2(
+        window.innerWidth * texPixelRatio,
+        window.innerHeight * texPixelRatio
+      ),
     },
   },
 })
+
+export const update = ({ time, pointerPos, beforePointerPos, dataTex }) => {
+  material.uniforms.time.value = time
+  material.uniforms.pointerPos.value = pointerPos
+  material.uniforms.beforePointerPos.value = beforePointerPos
+  material.uniforms.dataTex.value = dataTex
+}
+
+export const resize = ({ texResolution }) => {
+  material.uniforms.texResolution.value = texResolution
+}

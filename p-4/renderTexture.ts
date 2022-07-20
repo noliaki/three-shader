@@ -31,8 +31,6 @@ void main(){
   })
 )
 
-console.log(mesh.geometry)
-
 export const scene = new Scene()
 const renderTargets = [...new Array(2)].map((_) => {
   const rt = new WebGLRenderTarget(texW, texH, {

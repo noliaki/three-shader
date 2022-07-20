@@ -1,18 +1,16 @@
 uniform float time;
-uniform float texPixelRatio;
 uniform float viscosity;
 uniform float forceRadius;
 uniform float forceCoefficient;
 uniform float autoforceCoefficient;
-uniform vec2 resolution;
 uniform sampler2D dataTex;
 uniform vec2 pointerPos;
 uniform vec2 beforePointerPos;
+uniform vec2 texResolution;
 
 void main(){
-  vec2 r = resolution * texPixelRatio;
   vec2 fc = gl_FragCoord.xy;
-  vec2 uv = fc / r;
+  vec2 uv = fc / texResolution;
   vec4 data = texture2D(dataTex, uv);
   vec2 v = data.xy;
 
@@ -20,22 +18,19 @@ void main(){
   vec2 offsetY = vec2(0.0, 1.0);
 
   // 上下左右の圧力
-  float pLeft = samplePressure(dataTex, (fc - offsetX) / r, r);
-  float pRight = samplePressure(dataTex, (fc + offsetX) / r, r);
-  float pTop = samplePressure(dataTex, (fc - offsetY) / r, r);
-  float pBottom = samplePressure(dataTex, (fc + offsetY) / r, r);
+  float pLeft = samplePressure(dataTex, (fc - offsetX) / texResolution, texResolution);
+  float pRight = samplePressure(dataTex, (fc + offsetX) / texResolution, texResolution);
+  float pTop = samplePressure(dataTex, (fc - offsetY) / texResolution, texResolution);
+  float pBottom = samplePressure(dataTex, (fc + offsetY) / texResolution, texResolution);
 
   // マウス
-  vec2 mPos = vec2(pointerPos.x * texPixelRatio, r.y - pointerPos.y * texPixelRatio);
-  vec2 mPPos = vec2(beforePointerPos.x * texPixelRatio, r.y - beforePointerPos.y * texPixelRatio);
+  vec2 mPos = vec2(pointerPos.x, texResolution.y - pointerPos.y);
+  vec2 mPPos = vec2(beforePointerPos.x, texResolution.y - beforePointerPos.y);
   vec2 mouseV = mPos - mPPos;
   vec2 diff = mPos - fc;
-  float len =
-    length(diff) /
-    // (forceRadius + snoise(vec3(uv, time * 0.00003)) * forceRadius * 0.8) /
-    (forceRadius) /
-    texPixelRatio;
+  float len = length(diff) / forceRadius;
   float d = smoothstep(0.0, 1.0, 1.0 - len) * length(mouseV) * forceCoefficient;
+  // vec2 mforce = d;
   vec2 mforce = d * normalize(diff + mouseV);
 
   // 自動
