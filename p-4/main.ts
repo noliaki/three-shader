@@ -36,7 +36,11 @@ import {
   update as updateVelocity,
   resize as resizeVelocity,
 } from './velocity'
-import { material as advectMaterial } from './advect'
+import {
+  material as advectMaterial,
+  resize as resizeAdvect,
+  updateTexture as updateAdvectTexture,
+} from './advect'
 import Stats from 'three/examples/jsm/libs/stats.module'
 
 const stats = Stats()
@@ -124,23 +128,15 @@ const update = () => {
     ),
     dataTex: getRenderTexture(),
   })
-  // velocityMaterial.uniforms.time.value = time
-  // velocityMaterial.uniforms.pointerPos.value = new Vector2(
-  //   mousePoint.x,
-  //   mousePoint.y
-  // )
-  // velocityMaterial.uniforms.beforePointerPos.value = new Vector2(
-  //   prevMousePoint.x,
-  //   prevMousePoint.y
-  // )
-  // velocityMaterial.uniforms.dataTex.value = getRenderTexture()
   setMaterial(velocityMaterial)
   swapRenderTeture()
   renderRenderTexture({ renderer, camera })
 
   // -----------------------
   // advect
-  advectMaterial.uniforms.dataTex.value = getRenderTexture()
+  updateAdvectTexture({
+    texture: getRenderTexture(),
+  })
   setMaterial(advectMaterial)
   swapRenderTeture()
   renderRenderTexture({ renderer, camera })
@@ -202,7 +198,10 @@ const onWinResize = (_event?: Event): void => {
     texResolution: tr,
   })
   // velocityMaterial.uniforms.resolution.value = r
-  advectMaterial.uniforms.resolution.value = r
+  // advectMaterial.uniforms.resolution.value = r
+  resizeAdvect({
+    texResolution: tr,
+  })
   mesh.material.uniforms.resolution.value = r
 
   setCamera()
