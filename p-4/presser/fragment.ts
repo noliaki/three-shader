@@ -1,9 +1,9 @@
 import shader from './fragment.frag?raw'
-import samplePressure from '../utils/samplePressure.glsl?raw'
+import sample from '../utils/sample.glsl?raw'
 
 export const fragmentShader = `
 precision highp float;
 
-${samplePressure}
+${sample}
 ${shader}
 `

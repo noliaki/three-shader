@@ -1,6 +1,6 @@
 // =================
 // 速度
-import { RawShaderMaterial, Texture, Vector2, WebGLRenderTarget } from 'three'
+import { RawShaderMaterial, Texture, Vector2 } from 'three'
 import vertexShader from '../common.vert?raw'
 import { fragmentShader } from './fragment'
 import {

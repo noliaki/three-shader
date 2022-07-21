@@ -67,10 +67,12 @@ const mesh = new Mesh(
     depthWrite: false,
     uniforms: {
       time: { value: 0 },
-      texPixelRatio: { value: texPixelRatio },
       dataTex: { value: new Texture() },
       resolution: { value: new Vector2(winWidth, winHeight) },
       devicePixelRatio: { value: devicePixelRatio },
+      texResolution: {
+        value: new Vector2(winWidth * texPixelRatio, winHeight * texPixelRatio),
+      },
     },
   })
 )
@@ -84,8 +86,6 @@ const camera = new OrthographicCamera(
   -100,
   100
 )
-camera.position.z = 10
-camera.lookAt(0, 0, 0)
 const renderer = new WebGLRenderer({
   alpha: true,
   preserveDrawingBuffer: true,
@@ -182,7 +182,6 @@ const setCamera = (
 }
 
 const onWinResize = (_event?: Event): void => {
-  const r = new Vector2(window.innerWidth, window.innerHeight)
   const tr = new Vector2(
     window.innerWidth * texPixelRatio,
     window.innerHeight * texPixelRatio
@@ -197,23 +196,37 @@ const onWinResize = (_event?: Event): void => {
   resizeVelocity({
     texResolution: tr,
   })
-  // velocityMaterial.uniforms.resolution.value = r
-  // advectMaterial.uniforms.resolution.value = r
   resizeAdvect({
     texResolution: tr,
   })
-  mesh.material.uniforms.resolution.value = r
+
+  mesh.material.uniforms.resolution.value = new Vector2(
+    window.innerWidth,
+    window.innerHeight
+  )
+  mesh.material.uniforms.texResolution.value = tr
 
   setCamera()
   setRenderer()
   resizeRenderTexture()
 }
 
-window.addEventListener(
+document.addEventListener(
   'mousemove',
   (event: MouseEvent): void => {
     mousePoint.x = event.clientX
     mousePoint.y = event.clientY
+  },
+  {
+    passive: true,
+  }
+)
+
+document.addEventListener(
+  'touchmove',
+  (event: TouchEvent): void => {
+    mousePoint.x = event.touches[0].clientX
+    mousePoint.y = event.touches[0].clientY
   },
   {
     passive: true,
@@ -228,9 +241,4 @@ document.body.appendChild(stats.domElement)
 document.body.appendChild(renderer.domElement)
 
 onWinResize()
-
-renderRenderTexture({ renderer, camera })
-swapRenderTeture()
-renderRenderTexture({ renderer, camera })
-
 update()

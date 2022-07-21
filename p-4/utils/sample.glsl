@@ -1,4 +1,4 @@
-vec4 sampleVelocity(sampler2D tex, vec2 uv, vec2 resolution, bool multiplier) {
+vec4 sample(sampler2D tex, vec2 uv, vec2 resolution, bool multiplier) {
   vec2 o = vec2(0.0, 0.0);
   vec2 m = vec2(1.0, 1.0);
 
@@ -18,7 +18,11 @@ vec4 sampleVelocity(sampler2D tex, vec2 uv, vec2 resolution, bool multiplier) {
     m.y = -1.0;
   }
 
-  vec4 result = texture2D(tex, uv + o / resolution)
+  vec4 result = texture2D(tex, uv + o / resolution);
 
-  return multiplier ? multiplier * result : result;
+  if (multiplier) {
+    result.xy *= m;
+  }
+
+  return result;
 }

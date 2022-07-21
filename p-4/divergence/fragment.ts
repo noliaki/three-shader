@@ -1,9 +1,9 @@
 import main from './fragment.frag?raw'
-import sampleVelocity from '../utils/sampleVelocity.glsl?raw'
+import sample from '../utils/sample.glsl?raw'
 
 export const fragmentShader = `
 precision highp float;
 
-${sampleVelocity}
+${sample}
 ${main}
 `
