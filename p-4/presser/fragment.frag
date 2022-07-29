@@ -10,10 +10,10 @@ void main(){
   vec2 yShift = vec2(0.0, 1.0);
 
   // 上下左右の圧力
-  float pLeft = sample(dataTex, (fc - xShift) / texResolution, texResolution, false).z;
-  float pRight = sample(dataTex, (fc + xShift) / texResolution, texResolution, false).z;
-  float pTop = sample(dataTex, (fc - yShift) / texResolution, texResolution, false).z;
-  float pBottom = sample(dataTex, (fc + yShift) / texResolution, texResolution, false).z;
+  float pLeft = sample(dataTex, (fc - xShift) / texResolution, texResolution).z;
+  float pRight = sample(dataTex, (fc + xShift) / texResolution, texResolution).z;
+  float pTop = sample(dataTex, (fc - yShift) / texResolution, texResolution).z;
+  float pBottom = sample(dataTex, (fc + yShift) / texResolution, texResolution).z;
 
   float divergence = data.w;
   float pressure = (divergence * alpha + (pLeft + pRight + pTop + pBottom)) * 0.25 * beta;

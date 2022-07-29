@@ -1,4 +1,4 @@
-export const texPixelRatio = 0.4
+export const texPixelRatio = 0.25
 export const solverIteration = 10
 export const attenuation = 1.0
 export const alpha = 1.0

@@ -17,10 +17,10 @@ void main(){
   vec2 offsetX = vec2(1.0, 0.0);
   vec2 offsetY = vec2(0.0, 1.0);
 
-  float pLeft = sample(dataTex, (fc - offsetX) / texResolution, texResolution, false).z;
-  float pRight = sample(dataTex, (fc + offsetX) / texResolution, texResolution, false).z;
-  float pTop = sample(dataTex, (fc - offsetY) / texResolution, texResolution, false).z;
-  float pBottom = sample(dataTex, (fc + offsetY) / texResolution, texResolution, false).z;
+  float pLeft = sample(dataTex, (fc - offsetX) / texResolution, texResolution).z;
+  float pRight = sample(dataTex, (fc + offsetX) / texResolution, texResolution).z;
+  float pTop = sample(dataTex, (fc - offsetY) / texResolution, texResolution).z;
+  float pBottom = sample(dataTex, (fc + offsetY) / texResolution, texResolution).z;
 
   vec2 mPos = vec2(pointerPos.x, texResolution.y - pointerPos.y);
   vec2 mPPos = vec2(beforePointerPos.x, texResolution.y - beforePointerPos.y);
