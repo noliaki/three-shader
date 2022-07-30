@@ -42,6 +42,7 @@ void main() {
   gl_FragColor = vec4(
     // nv2 * attenuation,
     bilerp(dataTex, fc - sampleV(dataTex, uv, texResolution).xy, texResolution) * attenuation,
+    // texture2D(dataTex, p).xy * attenuation,
     data.z,
     0.0
   );
