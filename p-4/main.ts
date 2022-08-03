@@ -83,12 +83,12 @@ const camera = new OrthographicCamera(
   winWidth * 0.5,
   winHeight * 0.5,
   -winHeight * 0.5,
-  -100,
-  100
+  0,
+  0
 )
 const renderer = new WebGLRenderer({
-  alpha: true,
-  preserveDrawingBuffer: true,
+  // alpha: true,
+  // preserveDrawingBuffer: false,
 })
 
 const update = () => {

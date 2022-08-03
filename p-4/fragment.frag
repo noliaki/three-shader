@@ -4,6 +4,10 @@ uniform vec2 resolution;
 uniform vec2 texResolution;
 uniform sampler2D dataTex;
 
+// float random (vec2 st) {
+//   return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+// }
+
 vec3 hsvToRgb(float h, float s, float v){
   vec4 t = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
   vec3 p = abs(fract(vec3(h) + t.xyz) * 6.0 - vec3(t.w));

@@ -27,7 +27,7 @@ void main(){
   vec2 mouseV = mPos - mPPos;
   vec2 diff = mPos - fc;
   float len = length(diff) / forceRadius;
-  float d = smoothstep(0.0, 1.0, 1.0 - len) * length(mouseV) * forceCoefficient;
+  float d = smoothstep(0.0, 1.0, 1.0 - len) * length(mouseV) * 0.99;
   vec2 mforce = d * normalize(diff + mouseV);
 
   v += vec2(pRight - pLeft, pBottom - pTop) * 0.5;
