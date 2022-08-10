@@ -6,14 +6,10 @@ uniform vec2 imageResolution;
 uniform sampler2D dataTex;
 uniform sampler2D imageTex;
 
-// float random (vec2 st) {
-//   return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
-// }
-
 vec2 imageRatio(vec2 resolution, vec2 imageResolution) {
   return vec2(
-    max((resolution.x / resolution.y) / (imageResolution.x / imageResolution.y), 1.0),
-    max((resolution.y / resolution.x) / (imageResolution.y / imageResolution.x), 1.0)
+    min((resolution.x / resolution.y) / (imageResolution.x / imageResolution.y), 1.0),
+    min((resolution.y / resolution.x) / (imageResolution.y / imageResolution.x), 1.0)
   );
 }
 
@@ -76,7 +72,7 @@ void main(){
   float vLength = length(velocity);
 
   vec2 vr = velocity / texResolution;
-  vec3 imageColor = texture2D(imageTex, iuv).rgb;
+  vec3 imageColor = texture2D(imageTex, iuv - velocity * 0.003).rgb;
 
   float hue = (sin(time * 0.00009) + 1.0) * 0.5;
 
@@ -85,13 +81,13 @@ void main(){
     0.7 + pressure * 0.05,
     0.5 + (pressure * 0.01) + length(vLength) * 0.5
   );
+  vec3 shiftColor = yiqHueShift(color, (snoise(vec3(vr, time * 0.00009)) + 1.0) * 0.5);
 
   gl_FragColor = vec4(
     mix(
-      yiqHueShift(color, (snoise(vec3(vr, time * 0.00009)) + 1.0) * 0.5),
+      shiftColor,
       imageColor,
-      // vLength
-      clamp(0.0, 1.0, vLength * length(pressure) * 0.07)
+      smoothstep(0.0, 1.0, vLength * length(pressure) * 0.25)
     ),
     1.0
   );
