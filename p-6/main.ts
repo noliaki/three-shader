@@ -8,6 +8,7 @@ import {
   PlaneBufferGeometry,
   Mesh,
   Scene,
+  TextureLoader,
 } from 'three'
 import { debounce } from '../src/utility'
 
@@ -72,6 +73,12 @@ const mesh = new Mesh(
       devicePixelRatio: { value: devicePixelRatio },
       texResolution: {
         value: new Vector2(winWidth * texPixelRatio, winHeight * texPixelRatio),
+      },
+      imageTex: {
+        value: new Texture(),
+      },
+      imageResolution: {
+        value: new Vector2(0, 0),
       },
     },
   })
@@ -239,6 +246,16 @@ renderer.setPixelRatio(devicePixelRatio)
 scene.add(mesh)
 document.body.appendChild(stats.domElement)
 document.body.appendChild(renderer.domElement)
+
+new TextureLoader().load('/p-5/DSC00135.JPG', (texture) => {
+  const { material } = mesh
+
+  material.uniforms.imageTex.value = texture
+  material.uniforms.imageResolution.value = new Vector2(
+    texture.image.naturalWidth,
+    texture.image.naturalHeight
+  )
+})
 
 onWinResize()
 update()
