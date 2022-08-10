@@ -10,8 +10,8 @@ float random (vec2 st) {
   return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
 }
 
-vec2 bilerp(sampler2D tex, vec2 p, vec2 resolution) {
-  vec4 ij; // i0, j0, i1, j1
+vec2 lerp(sampler2D tex, vec2 p, vec2 resolution) {
+  vec4 ij;
   ij.xy = floor(p - diff) + diff;
   ij.zw = ij.xy + 1.0;
 
@@ -33,22 +33,8 @@ void main() {
   vec4 data = texture2D(dataTex, uv);
   vec2 p = uv - data.xy * dt * ratio;
 
-  // vec2 nv = texture2D(dataTex, p).xy;
-  // vec2 ns = p + nv * dt * ratio;
-
-  // vec2 err = ns - uv;
-
-  // vec2 ns2 = ns - err / 2.0;
-  // vec2 v2 = texture2D(dataTex, ns2).xy;
-
-  // vec2 os2 = ns2 - v2 * dt * ratio;
-  // vec2 nv2 = texture2D(dataTex, os2).xy;
-  // vec2 p = (fc - data.xy) / texResolution;
-
   gl_FragColor = vec4(
-    // nv2 * attenuation,
-    bilerp(dataTex, fc - sampleV(dataTex, uv, texResolution).xy, texResolution) * attenuation + r * 0.05,
-    // texture2D(dataTex, p).xy * attenuation,
+    lerp(dataTex, fc - sampleV(dataTex, uv, texResolution).xy, texResolution) * attenuation + r * 0.05,
     data.z,
     0.0
   );

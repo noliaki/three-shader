@@ -9,7 +9,6 @@ void main(){
   vec2 xShift = vec2(1.0, 0.0);
   vec2 yShift = vec2(0.0, 1.0);
 
-  // 上下左右の圧力
   float pLeft = sample(dataTex, (fc - xShift) / texResolution, texResolution).z;
   float pRight = sample(dataTex, (fc + xShift) / texResolution, texResolution).z;
   float pTop = sample(dataTex, (fc - yShift) / texResolution, texResolution).z;

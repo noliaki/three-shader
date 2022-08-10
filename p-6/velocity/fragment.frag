@@ -22,10 +22,10 @@ void main(){
   float pTop = sample(dataTex, (fc - offsetY) / texResolution, texResolution).z;
   float pBottom = sample(dataTex, (fc + offsetY) / texResolution, texResolution).z;
 
-  vec2 mPos = vec2(pointerPos.x, texResolution.y - pointerPos.y);
-  vec2 mPPos = vec2(beforePointerPos.x, texResolution.y - beforePointerPos.y);
-  vec2 mouseV = mPos - mPPos;
-  vec2 diff = mPos - fc;
+  vec2 mouse = vec2(pointerPos.x, texResolution.y - pointerPos.y);
+  vec2 prevMouse = vec2(beforePointerPos.x, texResolution.y - beforePointerPos.y);
+  vec2 mouseV = mouse - prevMouse;
+  vec2 diff = mouse - fc;
   float len = length(diff) / forceRadius;
   float d = smoothstep(0.0, 1.0, 1.0 - len) * length(mouseV) * 0.99;
   vec2 mforce = d * normalize(diff + mouseV);
