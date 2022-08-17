@@ -9,13 +9,21 @@ import {
   FloatType,
   RawShaderMaterial,
 } from 'three'
-import { texPixelRatio } from './config'
+import { texPixelRatio } from '../config'
+import vertexShader from '../common.vert?raw'
+import { fragmentShader } from './fragment'
 
 let currentIndex = 0
 const texW = 100 //window.innerWidth * texPixelRatio
 const texH = 100 //window.innerHeight * texPixelRatio
 
-export const mesh = new Mesh(new PlaneBufferGeometry(texW, texH, 1, 1))
+export const mesh = new Mesh(
+  new PlaneBufferGeometry(texW, texH, 1, 1),
+  new RawShaderMaterial({
+    vertexShader,
+    fragmentShader,
+  })
+)
 
 export const scene = new Scene()
 const renderTargets = [...new Array(2)].map((_) => {
