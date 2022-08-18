@@ -4,7 +4,7 @@ uniform vec2 resolution;
 uniform vec2 texResolution;
 uniform vec2 imageResolution;
 uniform sampler2D dataTex;
-uniform sampler2D imageTex;
+// uniform sampler2D imageTex;
 
 vec2 imageRatio(vec2 resolution, vec2 imageResolution) {
   return vec2(
@@ -60,14 +60,14 @@ vec3 yiqHueShift(vec3 color, float hueAdjust) {
 
 void main(){
   vec2 uv = gl_FragCoord.xy / resolution.xy / devicePixelRatio;
-  vec2 iuv = imageUv(resolution, imageResolution, uv);
+  // vec2 iuv = imageUv(resolution, imageResolution, uv);
   vec4 data = texture2D(dataTex, uv);
   vec2 velocity = data.xy;
   float pressure = data.z;
   float vLength = length(velocity);
 
   vec2 vr = velocity / texResolution;
-  vec3 imageColor = texture2D(imageTex, iuv - velocity * 0.003).rgb;
+  // vec3 imageColor = texture2D(imageTex, iuv - velocity * 0.003).rgb;
 
   float hue = (sin(time * 0.00009) + 1.0) * 0.5;
 
@@ -79,11 +79,7 @@ void main(){
   vec3 shiftColor = yiqHueShift(color, (snoise(vec3(vr, time * 0.00009)) + 1.0) * 0.5);
 
   gl_FragColor = vec4(
-    mix(
-      shiftColor,
-      imageColor,
-      smoothstep(0.0, 1.0, vLength * length(pressure) * 0.25)
-    ),
+    shiftColor,
     1.0
   );
 }

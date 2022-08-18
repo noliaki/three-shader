@@ -1,23 +1,32 @@
 import { Texture, CanvasTexture } from 'three'
 
-const canvas = document.createElement('canvas')
-const context = canvas.getContext('2d')!
-const testure = new CanvasTexture(canvas)
+let canvas = document.createElement('canvas')
+let context = canvas.getContext('2d')!
+let testure = new CanvasTexture(canvas)
 
-canvas.width = window.innerWidth
-canvas.height = window.innerHeight
+export const resize = ({
+  width = window.innerWidth,
+  height = window.innerHeight,
+} = {}) => {
+  if (canvas == null) {
+    return
+  }
 
-context.fillStyle = '#fff'
-context.font = `${Math.min(canvas.width, canvas.height)}px serif`
-context.textBaseline = 'top'
-context.textAlign = 'left'
+  canvas.width = width
+  canvas.height = height
 
-export const getFontTexture = (
-  text: string = 'A',
-  width: number = window.innerWidth,
-  height: number = window.innerHeight
-): Texture => {
-  context.clearRect(0, 0, window.innerWidth, window.innerHeight)
+  context = canvas.getContext('2d')!
+  context.fillStyle = '#fff'
+  context.font = `${Math.min(canvas.width, canvas.height) * 0.7}px serif`
+  context.textBaseline = 'top'
+  context.textAlign = 'left'
+  testure = new CanvasTexture(canvas)
+}
+
+export const getFontTexture = (text: string = 'A'): Texture => {
+  const width = context.canvas.width
+  const height = context.canvas.height
+  context.clearRect(0, 0, width, height)
 
   const result = context.measureText(text)
   const textWidth = result.width
@@ -35,3 +44,5 @@ export const getFontTexture = (
 
   return testure
 }
+
+resize()

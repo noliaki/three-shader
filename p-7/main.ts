@@ -36,6 +36,7 @@ import {
   material as velocityMaterial,
   update as updateVelocity,
   resize as resizeVelocity,
+  updateTextTex,
 } from './velocity'
 import {
   material as advectMaterial,
@@ -43,18 +44,18 @@ import {
   updateTexture as updateAdvectTexture,
 } from './advect'
 import Stats from 'three/examples/jsm/libs/stats.module'
-import { getFontTexture } from './font'
+import { getFontTexture, resize as fontTexResize } from './font'
 
 const stats = Stats()
 
-const mousePoint = {
-  x: 0,
-  y: 0,
-}
-const prevMousePoint = {
-  x: 0,
-  y: 0,
-}
+// const mousePoint = {
+//   x: 0,
+//   y: 0,
+// }
+// const prevMousePoint = {
+//   x: 0,
+//   y: 0,
+// }
 
 const start = Date.now()
 const winWidth = window.innerWidth
@@ -74,12 +75,6 @@ const mesh = new Mesh(
       devicePixelRatio: { value: devicePixelRatio },
       texResolution: {
         value: new Vector2(winWidth * texPixelRatio, winHeight * texPixelRatio),
-      },
-      imageTex: {
-        value: new Texture(),
-      },
-      imageResolution: {
-        value: new Vector2(0, 0),
       },
     },
   })
@@ -126,14 +121,14 @@ const update = () => {
   // velocity
   updateVelocity({
     time,
-    pointerPos: new Vector2(
-      mousePoint.x * texPixelRatio,
-      mousePoint.y * texPixelRatio
-    ),
-    beforePointerPos: new Vector2(
-      prevMousePoint.x * texPixelRatio,
-      prevMousePoint.y * texPixelRatio
-    ),
+    // pointerPos: new Vector2(
+    //   mousePoint.x * texPixelRatio,
+    //   mousePoint.y * texPixelRatio
+    // ),
+    // beforePointerPos: new Vector2(
+    //   prevMousePoint.x * texPixelRatio,
+    //   prevMousePoint.y * texPixelRatio
+    // ),
     dataTex: getRenderTexture(),
   })
   setMaterial(velocityMaterial)
@@ -158,9 +153,10 @@ const update = () => {
   renderer.setRenderTarget(null)
   renderer.render(scene, camera)
 
-  prevMousePoint.x = mousePoint.x
-  prevMousePoint.y = mousePoint.y
+  // prevMousePoint.x = mousePoint.x
+  // prevMousePoint.y = mousePoint.y
 
+  updateTextTex({ texture: new Texture() })
   stats.update()
 
   requestAnimationFrame(update)
@@ -214,6 +210,7 @@ const onWinResize = (_event?: Event): void => {
   )
   mesh.material.uniforms.texResolution.value = tr
 
+  fontTexResize()
   setCamera()
   setRenderer()
   resizeRenderTexture()
@@ -222,11 +219,39 @@ const onWinResize = (_event?: Event): void => {
 document.addEventListener(
   'keydown',
   (event: KeyboardEvent): void => {
-    if (event.isComposing || event.metaKey || event.altKey || event.ctrlKey) {
+    if (
+      event.isComposing ||
+      event.metaKey ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.shiftKey
+    ) {
       return
     }
 
-    updateFontTexture({ texture: getFontTexture(event.key) })
+    const texture = getFontTexture(event.key)
+
+    updateTextTex({ texture })
+  },
+  {
+    passive: true,
+  }
+)
+
+document.querySelector('input')?.addEventListener(
+  'input',
+  (event: Event): void => {
+    const el = event.currentTarget
+
+    if (!(el instanceof HTMLInputElement)) {
+      return
+    }
+
+    const texture = getFontTexture(el.value)
+
+    updateTextTex({ texture })
+
+    el.value = ''
   },
   {
     passive: true,
@@ -240,15 +265,15 @@ scene.add(mesh)
 document.body.appendChild(stats.domElement)
 document.body.appendChild(renderer.domElement)
 
-new TextureLoader().load('/p-5/DSC00135.JPG', (texture) => {
-  const { material } = mesh
+// new TextureLoader().load('/p-5/DSC00135.JPG', (texture) => {
+//   const { material } = mesh
 
-  material.uniforms.imageTex.value = texture
-  material.uniforms.imageResolution.value = new Vector2(
-    texture.image.naturalWidth,
-    texture.image.naturalHeight
-  )
-})
+//   material.uniforms.imageTex.value = texture
+//   material.uniforms.imageResolution.value = new Vector2(
+//     texture.image.naturalWidth,
+//     texture.image.naturalHeight
+//   )
+// })
 
 onWinResize()
 update()

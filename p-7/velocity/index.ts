@@ -21,18 +21,7 @@ export const material = new RawShaderMaterial({
     forceCoefficient: { value: forceCoefficient },
     autoforceCoefficient: { value: autoforceCoefficient },
     dataTex: { value: new Texture() },
-    pointerPos: {
-      value: new Vector2(
-        (window.innerWidth / 2) * texPixelRatio,
-        (window.innerHeight / 2) * texPixelRatio
-      ),
-    },
-    beforePointerPos: {
-      value: new Vector2(
-        (window.innerWidth / 2) * texPixelRatio,
-        (window.innerHeight / 2) * texPixelRatio
-      ),
-    },
+    textTex: { value: new Texture() },
     texResolution: {
       value: new Vector2(
         window.innerWidth * texPixelRatio,
@@ -42,11 +31,13 @@ export const material = new RawShaderMaterial({
   },
 })
 
-export const update = ({ time, pointerPos, beforePointerPos, dataTex }) => {
+export const update = ({ time, dataTex }) => {
   material.uniforms.time.value = time
-  material.uniforms.pointerPos.value = pointerPos
-  material.uniforms.beforePointerPos.value = beforePointerPos
   material.uniforms.dataTex.value = dataTex
+}
+
+export const updateTextTex = ({ texture }) => {
+  material.uniforms.textTex.value = texture
 }
 
 export const resize = ({ texResolution }) => {
