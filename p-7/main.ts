@@ -216,29 +216,31 @@ const onWinResize = (_event?: Event): void => {
   resizeRenderTexture()
 }
 
+const inputEl = document.querySelector('input')
+
 document.addEventListener(
   'keydown',
   (event: KeyboardEvent): void => {
     if (
       event.isComposing ||
-      event.metaKey ||
-      event.altKey ||
-      event.ctrlKey ||
-      event.shiftKey
+      /shift/i.test(event.key) ||
+      /alt/i.test(event.key) ||
+      /option/i.test(event.key) ||
+      /meta/i.test(event.key) ||
+      /command/i.test(event.key) ||
+      /ctrl/i.test(event.key)
     ) {
       return
     }
 
-    const texture = getFontTexture(event.key)
-
-    updateTextTex({ texture })
+    updateTextTex({ texture: getFontTexture(event.key) })
   },
   {
     passive: true,
   }
 )
 
-document.querySelector('input')?.addEventListener(
+inputEl?.addEventListener(
   'input',
   (event: Event): void => {
     const el = event.currentTarget
@@ -247,16 +249,14 @@ document.querySelector('input')?.addEventListener(
       return
     }
 
-    const texture = getFontTexture(el.value)
-
-    updateTextTex({ texture })
-
     el.value = ''
   },
   {
     passive: true,
   }
 )
+
+inputEl?.focus()
 
 window.addEventListener('resize', debounce(onWinResize))
 
