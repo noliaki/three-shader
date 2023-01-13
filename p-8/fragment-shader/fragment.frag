@@ -60,15 +60,20 @@ vec3 yiqHueShift(vec3 color, float hueAdjust) {
 
 void main(){
   vec2 uv = gl_FragCoord.xy / resolution.xy / devicePixelRatio;
-  float sinTime = sin(time * 0.0006);
-  float timeStep = step(0.8, sinTime);
-  float t = timeStep < 1.0 ? floor(time / 50.0) : time;
+  float tTime = time * 0.008;
+  float sinTime = sin(tTime * 0.1);
+  float timeStep = step(0.78, sinTime);
+  float t = timeStep > 0.0 ? floor(tTime + 0.5) : tTime;
 
-  float noise = (snoise(vec3(uv, t * mix(0.09, 0.0006, timeStep)) + 1.0)) * 0.5;
+  float noise = (snoise(vec3(uv.y, uv.x, t * 0.07) + 1.0)) * 0.5;
 
-  float ratio = 5.0;
+  float ratio = 9.0;
   float stepNoise = floor(noise * ratio) / ratio;
-  vec3 color = mix(vec3(0.3, 0.2, 0.9), vec3(0.9, 0.2, 0.4), stepNoise);
+  vec3 color = mix(
+    yiqHueShift(vec3(0.1, 0.7, 0.9), noise * 0.5),
+    yiqHueShift(vec3(0.9, 0.9, 0.1), noise * 0.5),
+    stepNoise
+  );
 
   gl_FragColor = vec4(
     color,
